@@ -1,5 +1,6 @@
 package com.dixitkumar.galleryxapp.PhotosFragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -28,6 +29,7 @@ public class Photos_Fragment extends Fragment {
     }
 
     private void openCamera(){
-
+        Intent intent = new Intent(getContext(), Camera_ViewFinderActivity.class);
+        startActivity(intent);
     }
 }
