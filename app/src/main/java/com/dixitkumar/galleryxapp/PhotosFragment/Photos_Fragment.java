@@ -20,6 +20,14 @@ public class Photos_Fragment extends Fragment {
         // Inflate the layout for this fragment
         photosBinding = FragmentPhotosBinding.inflate(getLayoutInflater());
 
+        //Opening Camera on The Click Of Open Camera Button
+        photosBinding.openCamera.setOnClickListener(v ->{
+            openCamera();
+        });
         return photosBinding.getRoot();
+    }
+
+    private void openCamera(){
+
     }
 }
