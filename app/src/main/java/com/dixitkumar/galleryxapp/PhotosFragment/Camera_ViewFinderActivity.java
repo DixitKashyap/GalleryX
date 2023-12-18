@@ -34,7 +34,7 @@ import android.widget.Toast;
 
 import com.dixitkumar.galleryxapp.MainActivity;
 import com.dixitkumar.galleryxapp.R;
-import com.dixitkumar.galleryxapp.databinding.ActivityCameraViewFinderBinding;
+import com.dixitkumar.galleryxapp.databinding.ActivityCameraViewfinderBinding;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
@@ -44,7 +44,7 @@ import java.util.function.Predicate;
 
 public class Camera_ViewFinderActivity extends AppCompatActivity {
     private int cameraFacing = CameraSelector.LENS_FACING_BACK;
-    ActivityCameraViewFinderBinding viewFinderBinding;
+    ActivityCameraViewfinderBinding viewFinderBinding;
     private ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             new ActivityResultCallback<Boolean>() {
@@ -60,7 +60,7 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewFinderBinding = ActivityCameraViewFinderBinding.inflate(getLayoutInflater());
+        viewFinderBinding = ActivityCameraViewfinderBinding.inflate(getLayoutInflater());
         setContentView(viewFinderBinding.getRoot());
 
         //Check The Necessary Permission
@@ -91,7 +91,7 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
 
                 Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
-                viewFinderBinding.imageCaptureButton.setOnClickListener(new View.OnClickListener() {
+                viewFinderBinding.captureImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (ContextCompat.checkSelfPermission(Camera_ViewFinderActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
