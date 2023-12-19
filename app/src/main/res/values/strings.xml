@@ -11,4 +11,11 @@
     <string name="camera_Portrait">Portrait</string>
     <string name="camera_Night">Night</string>
     <string name="camera_AI">AI</string>
+    <string name="camera_settings">Settings</string>
+    <string name="camera_MovieFrame">Movie Frame</string>
+    <string name="camera_Gridlines">Gridlines</string>
+    <string name="camera_Macro">Macro</string>
+    <string name="camera_Tilt_shift">Tilt-Shift</string>
+    <string name="camera_Pro_color">Pro Color</string>
+    <string name="camera_time_burst">Time Burst</string>
 </resources>
