@@ -10,4 +10,5 @@
     <string name="camera_photos">Photos</string>
     <string name="camera_Portrait">Portrait</string>
     <string name="camera_Night">Night</string>
+    <string name="camera_AI">AI</string>
 </resources>
