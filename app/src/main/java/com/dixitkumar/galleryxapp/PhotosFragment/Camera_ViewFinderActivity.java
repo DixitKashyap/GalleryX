@@ -16,12 +16,15 @@ import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.Instrumentation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -35,6 +38,8 @@ import android.widget.Toast;
 import com.dixitkumar.galleryxapp.MainActivity;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityCameraViewfinderBinding;
+import com.dixitkumar.galleryxapp.databinding.TopSheetFragmentBinding;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
@@ -56,7 +61,11 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
                 }
             }
     );
+//    Creating Bottom Sheet Fragment Object
+    private BottomSheetDialog dialog;
+//    Creating Dialog  Object
 
+    private TopSheetFragmentBinding topSheetFragmentBinding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +78,23 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
         } else {
             startCamera(cameraFacing);
         }
+
+
+        //Initializing Bottom Sheet Dialog
+        dialog = new BottomSheetDialog(Camera_ViewFinderActivity.this);
+        showDialog();
+        //Bottom Sheet Fragment
+        viewFinderBinding.opnCameraMenu.setOnClickListener(v -> {
+
+            dialog.setContentView(topSheetFragmentBinding.getRoot());
+            dialog.show();
+
+        });
+    }
+
+    protected void showDialog() {
+        topSheetFragmentBinding = TopSheetFragmentBinding.inflate(getLayoutInflater());
+        topSheetFragmentBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
     }
 
     protected void startCamera(int cameraFacing) {
@@ -149,34 +175,5 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
             }
         });
     }
-  /*  private void takePicture(ImageCapture imageCapture) {
-        final File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) ,System.currentTimeMillis() + ".jpg");
-        Log.d("Path",file.getPath()+" ");
-        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(file).build();
-        imageCapture.takePicture(outputFileOptions, Executors.newCachedThreadPool(), new ImageCapture.OnImageSavedCallback() {
-            @Override
-            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(Camera_ViewFinderActivity.this, "Image saved at: " + file.getPath(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                startCamera(cameraFacing);
-            }
 
-            @Override
-            public void onError(@NonNull ImageCaptureException exception) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(Camera_ViewFinderActivity.this, "Failed to save: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                startCamera(cameraFacing);
-            }
-        });
-    }
-
-   */
 }
