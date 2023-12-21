@@ -23,6 +23,7 @@ import android.Manifest;
 import android.app.Instrumentation;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.BitmapDrawable;
@@ -89,6 +90,15 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
             dialog.setContentView(topSheetFragmentBinding.getRoot());
             dialog.show();
 
+        });
+
+        //Handling Click On Video Activity Button
+        viewFinderBinding.videoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Camera_ViewFinderActivity.this, VideoActivity.class);
+                startActivity(i);
+            }
         });
     }
 

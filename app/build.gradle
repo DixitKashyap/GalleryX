@@ -1,10 +1,11 @@
 plugins {
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
     namespace 'com.dixitkumar.galleryxapp'
-    compileSdk 33
+     compileSdkVersion 34
 
     defaultConfig {
         applicationId "com.dixitkumar.galleryxapp"
@@ -51,5 +52,6 @@ dependencies {
 
     implementation "androidx.camera:camera-view:${camerax_version}"
     implementation "androidx.camera:camera-extensions:${camerax_version}"
+    implementation 'androidx.camera:camera-viewfinder:1.4.0-alpha03'
 
 }

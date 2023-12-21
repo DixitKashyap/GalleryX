@@ -20,6 +20,7 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_marginTop="10dp"
+              android:gravity="center"
               android:layout_margin="10dp"
               android:orientation="vertical">
 
@@ -39,6 +40,7 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="@string/camera_settings"
+                  android:textSize="12sp"
                   android:textColor="@color/white"
                   android:layout_margin="5dp"/>
 
@@ -72,6 +74,7 @@
                   android:gravity="center"
                   android:text="@string/camera_MovieFrame"
                   android:textColor="@color/white"
+                  android:textSize="12sp"
                   android:layout_margin="5dp"/>
           </LinearLayout>
 
@@ -79,6 +82,7 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_marginTop="10dp"
+              android:gravity="center"
               android:layout_margin="10dp"
               android:orientation="vertical">
 
@@ -101,6 +105,7 @@
                   android:layout_height="wrap_content"
                   android:text="@string/camera_Gridlines"
                   android:textColor="@color/white"
+                  android:textSize="12sp"
                   android:layout_margin="5dp"/>
 
           </LinearLayout>
@@ -109,6 +114,7 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_marginTop="10dp"
+              android:gravity="center"
               android:layout_margin="10dp"
               android:orientation="vertical">
 
@@ -130,6 +136,7 @@
                   android:layout_height="wrap_content"
                   android:text="@string/camera_Macro"
                   android:textColor="@color/white"
+                  android:textSize="12sp"
                   android:layout_margin="5dp"/>
           </LinearLayout>
 
@@ -170,6 +177,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/camera_Tilt_shift"
                 android:textColor="@color/white"
+                android:textSize="12sp"
                 android:layout_margin="5dp"/>
 
         </LinearLayout>
@@ -200,6 +208,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/camera_Pro_color"
                 android:textColor="@color/white"
+                android:textSize="12sp"
                 android:layout_margin="5dp"/>
 
         </LinearLayout>
@@ -230,6 +239,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/camera_time_burst"
                 android:textColor="@color/white"
+                android:textSize="12sp"
                 android:layout_margin="5dp"/>
 
         </LinearLayout>
