@@ -10,30 +10,45 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
+import androidx.camera.core.CameraControl;
+import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.DisplayOrientedMeteringPointFactory;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.MeteringPoint;
 import androidx.camera.core.Preview;
+import androidx.camera.extensions.ExtensionsManager;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LifecycleOwner;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Dialog;
 import android.app.Instrumentation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.util.Log;
+import android.util.Size;
+import android.view.MotionEvent;
+import android.view.TextureView;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.dixitkumar.galleryxapp.MainActivity;
@@ -41,6 +56,7 @@ import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityCameraViewfinderBinding;
 import com.dixitkumar.galleryxapp.databinding.TopSheetFragmentBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
@@ -49,8 +65,10 @@ import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 public class Camera_ViewFinderActivity extends AppCompatActivity {
-    private int cameraFacing = CameraSelector.LENS_FACING_BACK;
+     int cameraFacing = CameraSelector.LENS_FACING_BACK;
     ActivityCameraViewfinderBinding viewFinderBinding;
+
+    private   ImageCapture imageCapture;
     private ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             new ActivityResultCallback<Boolean>() {
@@ -66,7 +84,10 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
     private BottomSheetDialog dialog;
 //    Creating Dialog  Object
 
+    //Camera Pro Mode DialogBox
+    Dialog dialogBox;
     private TopSheetFragmentBinding topSheetFragmentBinding;
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,16 +113,31 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
 
         });
 
+
+        //Camera Pro Mode
+        viewFinderBinding.cameraProMode.setOnClickListener(view -> {
+           makeDialogVisible();
+        });
+
         //Handling Click On Video Activity Button
         viewFinderBinding.videoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(Camera_ViewFinderActivity.this, VideoActivity.class);
                 startActivity(i);
+                finish();
             }
         });
+
+
     }
 
+    private void makeDialogVisible(){
+        dialogBox = new Dialog(this);
+        dialogBox.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogBox.setContentView(R.layout.pro_camera_menu);
+        dialogBox.show();
+    }
     protected void showDialog() {
         topSheetFragmentBinding = TopSheetFragmentBinding.inflate(getLayoutInflater());
         topSheetFragmentBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
@@ -113,11 +149,10 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
 
         listenableFuture.addListener(() -> {
             try {
-                ProcessCameraProvider cameraProvider = (ProcessCameraProvider) listenableFuture.get();
-
+                ProcessCameraProvider cameraProvider = (ProcessCameraProvider)listenableFuture.get();
                 Preview preview = new Preview.Builder().setTargetAspectRatio(aspectRatio).build();
 
-                ImageCapture imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                 imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                         .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
 
                 CameraSelector cameraSelector = new CameraSelector.Builder()
@@ -127,23 +162,62 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
 
                 Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
+                //For Performing operations that affects all outputs
+                CameraControl cameraControl = camera.getCameraControl();
+
+                //For Querying information and states
+                CameraInfo cameraInfo = camera.getCameraInfo();
+
                 viewFinderBinding.captureImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (ContextCompat.checkSelfPermission(Camera_ViewFinderActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             activityResultLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         }
-//                        takePicture(imageCapture);
                         captureImage(imageCapture);
                     }
                 });
 
+                //To Change Between Front and Back Camera
+                viewFinderBinding.cameraFlip.setOnClickListener(view -> {
+                    changeCamera(cameraFacing);
+                });
+
+                //To Turn Of And On Flash Mode
+                viewFinderBinding.flashButton.setOnClickListener(view -> {
+                    toggleFlash(camera);
+                });
 
                 preview.setSurfaceProvider(viewFinderBinding.viewFinder.getSurfaceProvider());
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
         }, ContextCompat.getMainExecutor(this));
+    }
+    private void changeCamera(int cameraFacing){
+        if(cameraFacing == CameraSelector.LENS_FACING_BACK){
+            cameraFacing = CameraSelector.LENS_FACING_FRONT;
+        }else{
+            cameraFacing = CameraSelector.LENS_FACING_BACK;
+        }
+        startCamera(cameraFacing);
+    }
+
+    private void toggleFlash(Camera camera){
+        if(camera.getCameraInfo().hasFlashUnit()){
+            if(imageCapture.getFlashMode() == ImageCapture.FLASH_MODE_OFF){
+                viewFinderBinding.flashButton.setImageResource(R.drawable.flash_on_icon);
+                imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
+            }else if(imageCapture.getFlashMode()==ImageCapture.FLASH_MODE_ON){
+                viewFinderBinding.flashButton.setImageResource(R.drawable.flash_auto_icon);
+                imageCapture.setFlashMode(ImageCapture.FLASH_MODE_AUTO);
+            }else if(imageCapture.getFlashMode() == ImageCapture.FLASH_MODE_AUTO){
+                viewFinderBinding.flashButton.setImageResource(R.drawable.no_flash_icon);
+                imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
+            }
+        }else{
+          runOnUiThread(()->  Snackbar.make(viewFinderBinding.getRoot(),"Flash Not Available !",Snackbar.LENGTH_SHORT).show());
+        }
     }
 
     private int aspectRatio(int width, int height) {

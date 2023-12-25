@@ -37,6 +37,7 @@
                 android:orientation="horizontal"
                 >
                 <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/flash_button"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:padding="2dp"
@@ -116,7 +117,9 @@
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" >
+
+    </androidx.camera.view.PreviewView>
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -145,6 +148,7 @@
                 android:orientation="horizontal"
                 >
                 <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/camera_pro_mode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="2dp"

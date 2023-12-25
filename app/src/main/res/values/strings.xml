@@ -18,4 +18,5 @@
     <string name="camera_Tilt_shift">Tilt-Shift</string>
     <string name="camera_Pro_color">Pro Color</string>
     <string name="camera_time_burst">Time Burst</string>
+    <string name="camera_high_quality">Camera Quality</string>
 </resources>

@@ -30,6 +30,10 @@ import android.widget.Toast;
 import com.dixitkumar.galleryxapp.MainActivity;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityVideoBinding;
+import com.dixitkumar.galleryxapp.databinding.BottomSheetNavigationVideoViewBinding;
+import com.dixitkumar.galleryxapp.databinding.TopSheetFragmentBinding;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.text.SimpleDateFormat;
@@ -54,6 +58,10 @@ public class VideoActivity extends AppCompatActivity {
             }
         }
     });
+
+    //Private Bottom Sheet Dialog
+    private BottomSheetDialog dialog;
+    private BottomSheetNavigationVideoViewBinding videoViewBinding;
 
 private ActivityVideoBinding activityVideoBinding ;
     @Override
@@ -99,6 +107,20 @@ private ActivityVideoBinding activityVideoBinding ;
         activityVideoBinding.flashButton.setOnClickListener(view -> {
 
         });
+
+        //Initializing Bottom Sheet Dialog
+        dialog = new BottomSheetDialog(VideoActivity.this);
+        showDialog();
+        //Making Menu Visible on Click on of a button
+        activityVideoBinding.videoMenuButton.setOnClickListener(view -> {
+            dialog.setContentView(videoViewBinding.getRoot());
+            dialog.show();
+        });
+    }
+
+    protected void showDialog() {
+        videoViewBinding = BottomSheetNavigationVideoViewBinding.inflate(getLayoutInflater());
+        videoViewBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
     }
 
     private void captureVideo(){
@@ -181,7 +203,7 @@ private ActivityVideoBinding activityVideoBinding ;
                 activityVideoBinding.flashButton.setImageResource(R.drawable.flash_on_icon);
             }
         }else{
-            runOnUiThread(() -> Toast.makeText(VideoActivity.this,"Flash is not Available",Toast.LENGTH_SHORT).show());
+            runOnUiThread(() ->  Toast.makeText(this,"Flash Not Available !",Toast.LENGTH_SHORT).show());
         }
     }
 
