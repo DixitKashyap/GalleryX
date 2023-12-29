@@ -1,6 +1,7 @@
 package com.dixitkumar.galleryxapp.PhotosFragment;
 
 import static android.os.Environment.getStorageDirectory;
+import static androidx.camera.core.MirrorMode.MIRROR_MODE_ON;
 import static java.lang.System.currentTimeMillis;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -14,16 +15,26 @@ import androidx.camera.core.CameraControl;
 import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.DisplayOrientedMeteringPointFactory;
+import androidx.camera.core.DynamicRange;
+import androidx.camera.core.ExperimentalZeroShutterLag;
+import androidx.camera.core.FocusMeteringAction;
+import androidx.camera.core.FocusMeteringResult;
+import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.MeteringPoint;
+import androidx.camera.core.MeteringPointFactory;
+import androidx.camera.core.MirrorMode;
 import androidx.camera.core.Preview;
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
+import androidx.camera.core.ZoomState;
 import androidx.camera.extensions.ExtensionsManager;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -37,18 +48,22 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.camera2.CameraCaptureSession;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.TextureView;
 import android.view.View;
 import android.view.Window;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.dixitkumar.galleryxapp.MainActivity;
@@ -61,14 +76,25 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-public class Camera_ViewFinderActivity extends AppCompatActivity {
+@ExperimentalZeroShutterLag public class Camera_ViewFinderActivity extends AppCompatActivity {
      int cameraFacing = CameraSelector.LENS_FACING_BACK;
-    ActivityCameraViewfinderBinding viewFinderBinding;
+  ActivityCameraViewfinderBinding viewFinderBinding;
 
     private   ImageCapture imageCapture;
+    private CameraControl cameraControl;
+    private ScaleGestureDetector scaleGestureDetector;
+    private CameraInfo cameraInfo;
+    private CameraSelector cameraSelector;
+    private ExecutorService cameraExecutor;
+    private Handler handler = new Handler();
+    private MediaPlayer cameraTime,captureSound;
+    private static boolean IS_ENABLED = false;
+
     private ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             new ActivityResultCallback<Boolean>() {
@@ -129,6 +155,16 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
             }
         });
 
+        //Capture Image after Specific Time delay
+         viewFinderBinding.cameraTimer.setOnClickListener(view ->{
+             if(!IS_ENABLED){
+                 viewFinderBinding.cameraTimer.setImageResource(R.drawable.time_off_icon);
+                 IS_ENABLED = true;
+             }else{
+                 viewFinderBinding.cameraTimer.setImageResource(R.drawable.time_burst_icon);
+                 IS_ENABLED = false;
+             }
+         });
 
     }
 
@@ -143,6 +179,8 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
         topSheetFragmentBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
     }
 
+
+    @SuppressLint("RestrictedApi")
     protected void startCamera(int cameraFacing) {
         int aspectRatio = aspectRatio(viewFinderBinding.viewFinder.getWidth(), viewFinderBinding.viewFinder.getHeight());
         ListenableFuture<ProcessCameraProvider> listenableFuture = ProcessCameraProvider.getInstance(this);
@@ -152,8 +190,8 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
                 ProcessCameraProvider cameraProvider = (ProcessCameraProvider)listenableFuture.get();
                 Preview preview = new Preview.Builder().setTargetAspectRatio(aspectRatio).build();
 
-                 imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                        .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
+                imageCapture = new ImageCapture.Builder()
+                        .setTargetRotation(cameraFacing).build();
 
                 CameraSelector cameraSelector = new CameraSelector.Builder()
                         .requireLensFacing(cameraFacing).build();
@@ -163,14 +201,41 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
                 Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
                 //For Performing operations that affects all outputs
-                CameraControl cameraControl = camera.getCameraControl();
+                 cameraControl = camera.getCameraControl();
+
+
 
                 //For Querying information and states
-                CameraInfo cameraInfo = camera.getCameraInfo();
+                 cameraInfo = camera.getCameraInfo();
 
-                viewFinderBinding.captureImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+
+                //AutoFocus Every X Seconds
+                MeteringPointFactory AFfactory = new SurfaceOrientedMeteringPointFactory((float)viewFinderBinding.viewFinder.getWidth(),(float)viewFinderBinding.viewFinder.getHeight());
+                float centerWidth = (float)viewFinderBinding.viewFinder.getWidth()/2;
+                float centerHeight = (float)viewFinderBinding.viewFinder.getHeight()/2;
+                MeteringPoint AFautoFocusPoint = AFfactory.createPoint(centerWidth, centerHeight);
+                try {
+                    FocusMeteringAction action = new FocusMeteringAction.Builder(AFautoFocusPoint,FocusMeteringAction.FLAG_AF).setAutoCancelDuration(1, TimeUnit.SECONDS).build();
+                    cameraControl.startFocusAndMetering(action);
+                }catch (Exception e){
+
+                }
+
+                //Camera Timer Option Added
+                viewFinderBinding.captureImage.setOnClickListener(view -> {
+
+                    if(IS_ENABLED){
+                        cameraTime = MediaPlayer.create(Camera_ViewFinderActivity.this,R.raw.camera_time_sound);
+                        cameraTime.start();
+                        cameraTime.setLooping(true);
+                        handler.postDelayed((Runnable) () -> {
+                            if (ContextCompat.checkSelfPermission(Camera_ViewFinderActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                activityResultLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                            }
+                            captureImage(imageCapture);
+                            cameraTime.stop();
+                        },5000);
+                    }else{
                         if (ContextCompat.checkSelfPermission(Camera_ViewFinderActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             activityResultLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         }
@@ -188,12 +253,17 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
                     toggleFlash(camera);
                 });
 
+
                 preview.setSurfaceProvider(viewFinderBinding.viewFinder.getSurfaceProvider());
+
+                pinchToZoom();
+                setUpZoomSlider();
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
         }, ContextCompat.getMainExecutor(this));
     }
+
     private void changeCamera(int cameraFacing){
         if(cameraFacing == CameraSelector.LENS_FACING_BACK){
             cameraFacing = CameraSelector.LENS_FACING_FRONT;
@@ -202,6 +272,58 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
         }
         startCamera(cameraFacing);
     }
+    //Setting Up Pinch to Zoom
+    private void pinchToZoom() {
+        //Pinch Zoom Camera
+        ScaleGestureDetector.SimpleOnScaleGestureListener listener = new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                LiveData<ZoomState> ZoomRatio = cameraInfo.getZoomState();
+                float currentZoomRatio = 0;
+                try {
+                    currentZoomRatio = ZoomRatio.getValue().getZoomRatio();
+                } catch (NullPointerException e) {
+
+                }
+                float linearValue = ZoomRatio.getValue().getLinearZoom();
+                float delta = detector.getScaleFactor();
+                cameraControl.setZoomRatio(currentZoomRatio * delta);
+                float mat = (linearValue) * (100);
+                viewFinderBinding.zoombar.setProgress((int) mat);
+                return true;
+            }
+        };
+
+        scaleGestureDetector = new ScaleGestureDetector(getBaseContext(), listener);
+    }
+
+    //Setting up the ZoomSlider
+    private void setUpZoomSlider(){
+        viewFinderBinding.zoombar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                float mat = (float) (progress) / (100);
+                cameraControl.setLinearZoom(mat);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        scaleGestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
 
     private void toggleFlash(Camera camera){
         if(camera.getCameraInfo().hasFlashUnit()){
@@ -243,13 +365,21 @@ public class Camera_ViewFinderActivity extends AppCompatActivity {
             contentValues.put(MediaStore.Images.Media.RELATIVE_PATH,"Pictures/GalleryXApp");
         }
 
+        ImageCapture.Metadata metadata = new ImageCapture.Metadata();
+        if(cameraFacing != CameraSelector.LENS_FACING_FRONT){
+            metadata.setReversedHorizontal(true);
+        }
+
+
         ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(
                 getContentResolver(),MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues
-        ).build();
+        ).setMetadata(metadata).build();
 
         imageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(Camera_ViewFinderActivity.this), new ImageCapture.OnImageSavedCallback() {
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                captureSound = MediaPlayer.create(Camera_ViewFinderActivity.this,R.raw.capture_image_sound);
+                captureSound.start();
                 Toast.makeText(Camera_ViewFinderActivity.this,"Image Saved"+outputFileResults.getSavedUri(),Toast.LENGTH_SHORT).show();
             }
 
