@@ -19,4 +19,6 @@
     <string name="camera_Pro_color">Pro Color</string>
     <string name="camera_time_burst">Time Burst</string>
     <string name="camera_high_quality">Camera Quality</string>
+    <string name="camera_Qr_Code_Scanner">QR Code</string>
+    <string name="camera_QR_Code_Content">QR Code Content</string>
 </resources>

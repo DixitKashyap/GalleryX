@@ -6,6 +6,6 @@
     </style>
 
     <style name="curved">
-        <item name="cornerSize">30%</item>
+        <item name="cornerSize">20%</item>
     </style>
 </resources>

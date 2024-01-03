@@ -1,95 +1,75 @@
 package com.dixitkumar.galleryxapp.PhotosFragment;
 
-import static android.os.Environment.getStorageDirectory;
-import static androidx.camera.core.MirrorMode.MIRROR_MODE_ON;
-import static java.lang.System.currentTimeMillis;
-
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraControl;
 import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
-import androidx.camera.core.DisplayOrientedMeteringPointFactory;
-import androidx.camera.core.DynamicRange;
 import androidx.camera.core.ExperimentalZeroShutterLag;
-import androidx.camera.core.FocusMeteringAction;
-import androidx.camera.core.FocusMeteringResult;
-import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
-import androidx.camera.core.MeteringPoint;
-import androidx.camera.core.MeteringPointFactory;
-import androidx.camera.core.MirrorMode;
 import androidx.camera.core.Preview;
-import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
 import androidx.camera.core.ZoomState;
-import androidx.camera.extensions.ExtensionsManager;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.Instrumentation;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.hardware.camera2.CameraCaptureSession;
+import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.util.Log;
-import android.util.Size;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.TextureView;
 import android.view.View;
 import android.view.Window;
+import android.webkit.URLUtil;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import com.dixitkumar.galleryxapp.MainActivity;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityCameraViewfinderBinding;
+import com.dixitkumar.galleryxapp.databinding.QrCodeLayoutBinding;
 import com.dixitkumar.galleryxapp.databinding.TopSheetFragmentBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 @ExperimentalZeroShutterLag public class Camera_ViewFinderActivity extends AppCompatActivity {
      int cameraFacing = CameraSelector.LENS_FACING_BACK;
-  ActivityCameraViewfinderBinding viewFinderBinding;
+ ActivityCameraViewfinderBinding viewFinderBinding;
 
     private   ImageCapture imageCapture;
+    private ProcessCameraProvider cameraProvider;
     private CameraControl cameraControl;
     private ScaleGestureDetector scaleGestureDetector;
     private CameraInfo cameraInfo;
-    private CameraSelector cameraSelector;
+    private CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
     private ExecutorService cameraExecutor;
     private Handler handler = new Handler();
     private MediaPlayer cameraTime,captureSound;
@@ -106,12 +86,13 @@ import java.util.function.Predicate;
                 }
             }
     );
-//    Creating Bottom Sheet Fragment Object
+//    Creating Bottom Sheet Fragment Object For Menu
     private BottomSheetDialog dialog;
 //    Creating Dialog  Object
 
-    //Camera Pro Mode DialogBox
-    Dialog dialogBox;
+    //Camera QrCode Bottom Sheet Fragment
+    private BottomSheetDialog QrCodeDialog;
+    private QrCodeLayoutBinding qrCodeLayoutBinding;
     private TopSheetFragmentBinding topSheetFragmentBinding;
     @SuppressLint("ResourceAsColor")
     @Override
@@ -119,6 +100,10 @@ import java.util.function.Predicate;
         super.onCreate(savedInstanceState);
         viewFinderBinding = ActivityCameraViewfinderBinding.inflate(getLayoutInflater());
         setContentView(viewFinderBinding.getRoot());
+
+        //Capture Image on Click of A Volume Button
+        takeKeyEvents(true);
+
 
         //Check The Necessary Permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -128,9 +113,10 @@ import java.util.function.Predicate;
         }
 
 
-        //Initializing Bottom Sheet Dialog
+        //Initializing Bottom Sheet Dialog For Menu
         dialog = new BottomSheetDialog(Camera_ViewFinderActivity.this);
-        showDialog();
+        topSheetFragmentBinding = TopSheetFragmentBinding.inflate(getLayoutInflater());
+        topSheetFragmentBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
         //Bottom Sheet Fragment
         viewFinderBinding.opnCameraMenu.setOnClickListener(v -> {
 
@@ -140,9 +126,16 @@ import java.util.function.Predicate;
         });
 
 
-        //Camera Pro Mode
-        viewFinderBinding.cameraProMode.setOnClickListener(view -> {
-           makeDialogVisible();
+        //Camera QR Code Layout
+
+        viewFinderBinding.cameraQrCode.setOnClickListener(view -> {
+
+            IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+            intentIntegrator.setPrompt("Scan a barcode or QR Code");
+            intentIntegrator.setOrientationLocked(true);
+            intentIntegrator.setBarcodeImageEnabled(true);
+            intentIntegrator.initiateScan();
+
         });
 
         //Handling Click On Video Activity Button
@@ -168,17 +161,32 @@ import java.util.function.Predicate;
 
     }
 
-    private void makeDialogVisible(){
-        dialogBox = new Dialog(this);
-        dialogBox.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialogBox.setContentView(R.layout.pro_camera_menu);
-        dialogBox.show();
+    private void setIsEnabled(boolean IS_ENABLED){
+        if(IS_ENABLED) {
+            cameraTime = MediaPlayer.create(Camera_ViewFinderActivity.this, R.raw.camera_time_sound);
+            cameraTime.start();
+            cameraTime.setLooping(true);
+            handler.postDelayed(() -> {
+                captureImage(imageCapture);
+                cameraTime.stop();
+            },5000);
+        }else{
+            captureImage(imageCapture);
+        }
     }
-    protected void showDialog() {
-        topSheetFragmentBinding = TopSheetFragmentBinding.inflate(getLayoutInflater());
-        topSheetFragmentBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+               setIsEnabled(IS_ENABLED);
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                setIsEnabled(IS_ENABLED);
+                return true;
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
     }
-
 
     @SuppressLint("RestrictedApi")
     protected void startCamera(int cameraFacing) {
@@ -187,39 +195,28 @@ import java.util.function.Predicate;
 
         listenableFuture.addListener(() -> {
             try {
-                ProcessCameraProvider cameraProvider = (ProcessCameraProvider)listenableFuture.get();
+                 cameraProvider = listenableFuture.get();
                 Preview preview = new Preview.Builder().setTargetAspectRatio(aspectRatio).build();
 
                 imageCapture = new ImageCapture.Builder()
-                        .setTargetRotation(cameraFacing).build();
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                        .setTargetRotation(viewFinderBinding.viewFinder.getDisplay().getRotation()).build();
 
-                CameraSelector cameraSelector = new CameraSelector.Builder()
+                cameraSelector = new CameraSelector.Builder()
                         .requireLensFacing(cameraFacing).build();
 
                 cameraProvider.unbindAll();
 
+                preview.setSurfaceProvider(viewFinderBinding.viewFinder.getSurfaceProvider());
                 Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
                 //For Performing operations that affects all outputs
                  cameraControl = camera.getCameraControl();
 
 
-
                 //For Querying information and states
                  cameraInfo = camera.getCameraInfo();
 
-
-                //AutoFocus Every X Seconds
-                MeteringPointFactory AFfactory = new SurfaceOrientedMeteringPointFactory((float)viewFinderBinding.viewFinder.getWidth(),(float)viewFinderBinding.viewFinder.getHeight());
-                float centerWidth = (float)viewFinderBinding.viewFinder.getWidth()/2;
-                float centerHeight = (float)viewFinderBinding.viewFinder.getHeight()/2;
-                MeteringPoint AFautoFocusPoint = AFfactory.createPoint(centerWidth, centerHeight);
-                try {
-                    FocusMeteringAction action = new FocusMeteringAction.Builder(AFautoFocusPoint,FocusMeteringAction.FLAG_AF).setAutoCancelDuration(1, TimeUnit.SECONDS).build();
-                    cameraControl.startFocusAndMetering(action);
-                }catch (Exception e){
-
-                }
 
                 //Camera Timer Option Added
                 viewFinderBinding.captureImage.setOnClickListener(view -> {
@@ -254,7 +251,7 @@ import java.util.function.Predicate;
                 });
 
 
-                preview.setSurfaceProvider(viewFinderBinding.viewFinder.getSurfaceProvider());
+//                preview.setSurfaceProvider(viewFinderBinding.viewFinder.getSurfaceProvider());
 
                 pinchToZoom();
                 setUpZoomSlider();
@@ -352,6 +349,7 @@ import java.util.function.Predicate;
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private void captureImage(ImageCapture imageCapture){
         if(imageCapture == null)return;
 
@@ -365,21 +363,16 @@ import java.util.function.Predicate;
             contentValues.put(MediaStore.Images.Media.RELATIVE_PATH,"Pictures/GalleryXApp");
         }
 
-        ImageCapture.Metadata metadata = new ImageCapture.Metadata();
-        if(cameraFacing != CameraSelector.LENS_FACING_FRONT){
-            metadata.setReversedHorizontal(true);
-        }
-
-
         ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(
                 getContentResolver(),MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues
-        ).setMetadata(metadata).build();
+        ).build();
 
         imageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(Camera_ViewFinderActivity.this), new ImageCapture.OnImageSavedCallback() {
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                 captureSound = MediaPlayer.create(Camera_ViewFinderActivity.this,R.raw.capture_image_sound);
                 captureSound.start();
+                setPreview();
                 Toast.makeText(Camera_ViewFinderActivity.this,"Image Saved"+outputFileResults.getSavedUri(),Toast.LENGTH_SHORT).show();
             }
 
@@ -390,4 +383,126 @@ import java.util.function.Predicate;
         });
     }
 
+
+    protected void setPreview(){
+        // Get the path of the most recent image from the public storage
+        String[] projection = new String[]{
+                MediaStore.Images.ImageColumns._ID,
+                MediaStore.Images.ImageColumns.DATA,
+                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.ImageColumns.DATE_TAKEN,
+                MediaStore.Images.ImageColumns.MIME_TYPE
+        };
+        final Cursor cursor = getContentResolver()
+                .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
+                        null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+
+// Get the first image file
+        if (cursor.moveToFirst()) {
+            String imageLocation = cursor.getString(1);
+            File imageFile = new File(imageLocation);
+            if (imageFile.exists()) {
+                // Check if the file exists and has read permission
+                Glide.with(this)
+                        .load(imageLocation)
+                        .apply(RequestOptions.placeholderOf(R.drawable.capture_image_preview_shape))
+                        .into(viewFinderBinding.viewPicture);
+            }
+        }
+        cursor.close();
+
+    }
+    private void makeQrCodeDialogVisible(){
+        QrCodeDialog = new BottomSheetDialog(Camera_ViewFinderActivity.this);
+        qrCodeLayoutBinding = QrCodeLayoutBinding.inflate(getLayoutInflater());
+        qrCodeLayoutBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
+        dialog.setContentView(qrCodeLayoutBinding.getRoot());
+        dialog.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        // if the intentResult is null then
+        // toast a message as "cancelled"
+        if (intentResult != null) {
+            if (intentResult.getContents() == null) {
+                Toast.makeText(getBaseContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+               makeQrCodeDialogVisible();
+
+               qrCodeLayoutBinding.cameraQrCodeContent.setText(intentResult.getContents());
+                String text_title = String.valueOf(qrCodeLayoutBinding.cameraQrCodeContent.getText());
+
+
+                //For Sharing Qr Code Data
+                qrCodeLayoutBinding.shareInfo.setOnClickListener(view -> {
+                  shareQrCodeData(text_title);
+                });
+               //For Opening Qr Code Link
+                qrCodeLayoutBinding.openLink.setOnClickListener(view -> {
+                    if(URLUtil.isValidUrl(text_title)){
+                        //initializing object for custom chrome tabs
+                         CustomTabsIntent.Builder customIntent = new CustomTabsIntent.Builder();
+
+                       //below line is setting toolbar color
+                       //for our custom chrome tab
+                       customIntent.setToolbarColor(ContextCompat.getColor(this,R.color.black));
+
+                       //we are calling below method after
+                        //setting our toolbar color
+                        openCustomTab(this, customIntent.build(),Uri.parse(text_title));
+                    }else{
+                        Toast.makeText(this, "URL is Not Valid ", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                //For Opening Qr Code Link in Your Phone Browser
+                qrCodeLayoutBinding.openInBrowser.setOnClickListener(view -> {
+                    if(URLUtil.isValidUrl(text_title)){
+                        Intent i = new Intent(Intent.ACTION_VIEW,Uri.parse(text_title));
+                        startActivity(i);
+                    }else{
+                        Toast.makeText(this,"URL is Not Valid",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+                //For Loading Image from Url
+                qrCodeLayoutBinding.imageSearch.setOnClickListener(view -> {
+                    if(URLUtil.isValidUrl(text_title)){
+                        qrCodeLayoutBinding.imageFrame.setVisibility(View.VISIBLE);
+                        Glide.with(this)
+                                .load(Uri.parse(text_title))
+                                .apply(RequestOptions.placeholderOf(R.drawable.no_image_avaliable_icon))
+                                .into(qrCodeLayoutBinding.cameraQrCodeImage);
+                    }else{
+                        Toast.makeText(this, "URL is Not Valid", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void openCustomTab(Activity activity, CustomTabsIntent customTabsIntent, Uri uri){
+        String packageName ="com.android.chrome";
+        if(packageName!=null){
+            customTabsIntent.intent.setPackage(packageName);
+            customTabsIntent.launchUrl(activity,uri);
+        }else{
+            //if Custom tabs fails to load then we are simply
+            // redirecting our user to userd device default browser
+            activity.startActivity(new Intent(Intent.ACTION_VIEW,uri));
+        }
+    }
+
+    private void shareQrCodeData(String data){
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/*");
+        i.putExtra(Intent.EXTRA_TEXT,"QR Code Info"+"\n\n" +data+" \n ");
+        startActivity(Intent.createChooser(i,"QR Code Info :- \n\n"));
+    }
 }
