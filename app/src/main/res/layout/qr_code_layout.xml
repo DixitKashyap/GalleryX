@@ -80,8 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:background="@drawable/capture_image_preview_shape"
-            android:src="@drawable/no_image_avaliable_icon"
+            android:background="@color/dark_grey"
             app:shapeAppearanceOverlay="@style/curved"
             app:strokeColor="@color/dark_grey"
             app:strokeWidth="2dp">

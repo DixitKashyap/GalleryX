@@ -25,8 +25,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
@@ -35,17 +38,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.Window;
 import android.webkit.URLUtil;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.dixitkumar.galleryxapp.MainActivity;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityCameraViewfinderBinding;
 import com.dixitkumar.galleryxapp.databinding.QrCodeLayoutBinding;
@@ -53,8 +59,13 @@ import com.dixitkumar.galleryxapp.databinding.TopSheetFragmentBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -74,6 +85,12 @@ import java.util.concurrent.ExecutorService;
     private Handler handler = new Handler();
     private MediaPlayer cameraTime,captureSound;
     private static boolean IS_ENABLED = false;
+    private static boolean IS_TIME_BURST_ENABLED = false;
+    private static String LANGUAGE_CODE = "";
+    private static boolean IS_TRANSLATION_MODE_ON = false;
+
+     Uri imageUri;
+    TextRecognizer textRecognizer;
 
     private ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
@@ -94,6 +111,13 @@ import java.util.concurrent.ExecutorService;
     private BottomSheetDialog QrCodeDialog;
     private QrCodeLayoutBinding qrCodeLayoutBinding;
     private TopSheetFragmentBinding topSheetFragmentBinding;
+
+
+    //Translator Bottom Sheet Fragment
+
+    private BottomSheetDialog translatorDialog;
+
+
     @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +128,8 @@ import java.util.concurrent.ExecutorService;
         //Capture Image on Click of A Volume Button
         takeKeyEvents(true);
 
+        //setting up the camera Preview
+        setPreview();
 
         //Check The Necessary Permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -124,7 +150,6 @@ import java.util.concurrent.ExecutorService;
             dialog.show();
 
         });
-
 
         //Camera QR Code Layout
 
@@ -150,7 +175,7 @@ import java.util.concurrent.ExecutorService;
 
         //Capture Image after Specific Time delay
          viewFinderBinding.cameraTimer.setOnClickListener(view ->{
-             if(!IS_ENABLED){
+             if(!IS_ENABLED && !IS_TIME_BURST_ENABLED && !IS_TRANSLATION_MODE_ON){
                  viewFinderBinding.cameraTimer.setImageResource(R.drawable.time_off_icon);
                  IS_ENABLED = true;
              }else{
@@ -158,6 +183,19 @@ import java.util.concurrent.ExecutorService;
                  IS_ENABLED = false;
              }
          });
+
+         //Setting Up The Camera Time Burst Mode
+         viewFinderBinding.timeBurstMode.setOnClickListener(view -> {
+             if(!IS_TIME_BURST_ENABLED && !IS_ENABLED &&!IS_TRANSLATION_MODE_ON){
+                 viewFinderBinding.timeBurstMode.setTextColor(ContextCompat.getColor(this,R.color.light_blue));
+                 IS_TIME_BURST_ENABLED = true;
+             }else{
+                 viewFinderBinding.timeBurstMode.setTextColor(ContextCompat.getColor(this,R.color.white));
+                 IS_TIME_BURST_ENABLED = false;
+             }
+         });
+         //Initializing Text Recognition
+        textRecognizer = TextRecognition.getClient(new DevanagariTextRecognizerOptions.Builder().build());
 
     }
 
@@ -221,8 +259,8 @@ import java.util.concurrent.ExecutorService;
                 //Camera Timer Option Added
                 viewFinderBinding.captureImage.setOnClickListener(view -> {
 
-                    if(IS_ENABLED){
-                        cameraTime = MediaPlayer.create(Camera_ViewFinderActivity.this,R.raw.camera_time_sound);
+                    if(IS_ENABLED) {
+                        cameraTime = MediaPlayer.create(Camera_ViewFinderActivity.this, R.raw.camera_time_sound);
                         cameraTime.start();
                         cameraTime.setLooping(true);
                         handler.postDelayed((Runnable) () -> {
@@ -231,8 +269,29 @@ import java.util.concurrent.ExecutorService;
                             }
                             captureImage(imageCapture);
                             cameraTime.stop();
-                        },5000);
-                    }else{
+                        }, 5000);
+                    }else if(IS_TIME_BURST_ENABLED){
+                        for(int i=0;i<5;i++) {
+                            handler.postAtTime((Runnable) () -> {
+                                if (ContextCompat.checkSelfPermission(Camera_ViewFinderActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    activityResultLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                                }
+                                captureImage(imageCapture);
+                            }, 2000);
+                        }
+                    }else if(IS_TRANSLATION_MODE_ON){
+                        captureImage(imageCapture);
+                       // Setting up the Translator mode
+                        handler.postDelayed((Runnable) () -> {
+                            if(imageUri!=null) {
+                                Intent i = new Intent(Camera_ViewFinderActivity.this, TextTranslatorActivity.class);
+                                i.putExtra("IMAGE_URI", imageUri.toString());
+                                startActivity(i);
+                            }else{
+                                Toast.makeText(this, "Image Uri is Null", Toast.LENGTH_SHORT).show();
+                            }
+                        },1500);
+                    } else {
                         if (ContextCompat.checkSelfPermission(Camera_ViewFinderActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             activityResultLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         }
@@ -250,9 +309,8 @@ import java.util.concurrent.ExecutorService;
                     toggleFlash(camera);
                 });
 
-
-//                preview.setSurfaceProvider(viewFinderBinding.viewFinder.getSurfaceProvider());
-
+                //Managing Text Extraction and Translation
+                cameraTranslatorOn();
                 pinchToZoom();
                 setUpZoomSlider();
             } catch (ExecutionException | InterruptedException e) {
@@ -260,6 +318,23 @@ import java.util.concurrent.ExecutorService;
             }
         }, ContextCompat.getMainExecutor(this));
     }
+
+
+    //Function For Managing Text Extraction and Translation
+    private void cameraTranslatorOn(){
+
+        viewFinderBinding.translateModeOn.setOnClickListener(view -> {
+
+            if(!IS_TRANSLATION_MODE_ON && imageCapture.getFlashMode()==ImageCapture.FLASH_MODE_OFF && !IS_ENABLED && !IS_TIME_BURST_ENABLED){
+                viewFinderBinding.translateModeOn.setImageResource(R.drawable.translate_icon_on);
+                IS_TRANSLATION_MODE_ON = true;
+            }else{
+                viewFinderBinding.translateModeOn.setImageResource(R.drawable.translate_icon);
+                IS_TRANSLATION_MODE_ON = false;
+            }
+        });
+    }
+
 
     private void changeCamera(int cameraFacing){
         if(cameraFacing == CameraSelector.LENS_FACING_BACK){
@@ -323,7 +398,7 @@ import java.util.concurrent.ExecutorService;
 
 
     private void toggleFlash(Camera camera){
-        if(camera.getCameraInfo().hasFlashUnit()){
+        if(camera.getCameraInfo().hasFlashUnit() && !IS_TRANSLATION_MODE_ON){
             if(imageCapture.getFlashMode() == ImageCapture.FLASH_MODE_OFF){
                 viewFinderBinding.flashButton.setImageResource(R.drawable.flash_on_icon);
                 imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
@@ -400,8 +475,10 @@ import java.util.concurrent.ExecutorService;
 // Get the first image file
         if (cursor.moveToFirst()) {
             String imageLocation = cursor.getString(1);
+            imageUri = Uri.parse(imageLocation);
             File imageFile = new File(imageLocation);
             if (imageFile.exists()) {
+                viewFinderBinding.viewPicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 // Check if the file exists and has read permission
                 Glide.with(this)
                         .load(imageLocation)
@@ -499,10 +576,16 @@ import java.util.concurrent.ExecutorService;
         }
     }
 
+
     private void shareQrCodeData(String data){
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("text/*");
         i.putExtra(Intent.EXTRA_TEXT,"QR Code Info"+"\n\n" +data+" \n ");
         startActivity(Intent.createChooser(i,"QR Code Info :- \n\n"));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

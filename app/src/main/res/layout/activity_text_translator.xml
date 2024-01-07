@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:screenReaderFocusable="true"
+    android:scrollbars="none"
+    android:layout_marginBottom="10dp"
+    android:fillViewport="true">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:background="@color/black"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/camera_text_translator_text_header"
+        android:textColor="@color/grey"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.059"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.122" />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/extracted_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="10dp"
+        app:boxStrokeColor="@color/light_blue"
+        android:textColorHint="@color/light_blue"
+        app:hintTextColor="@color/light_blue"
+        android:isScrollContainer="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/extracted_text_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColorHint="@color/light_blue"
+                            android:textColor="@color/grey"
+                            android:textSize="17sp"
+                            android:gravity="start"
+                            android:enabled="false"
+                            app:textInputLayoutFocusedRectEnabled="false"
+                            android:hint="Extracted Text From Image" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/translate_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@color/black"
+        android:scaleType="centerCrop"
+        android:src="@drawable/translate_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.643"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/extracted_text"
+        app:layout_constraintVertical_bias="0.036" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/copy_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@color/black"
+        android:scaleType="centerCrop"
+        android:src="@drawable/content_copy_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.956"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/extracted_text"
+        app:layout_constraintVertical_bias="0.037" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/clear_all_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@color/black"
+        android:scaleType="centerCrop"
+        android:src="@drawable/clear_all_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.041"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/extracted_text"
+        app:layout_constraintVertical_bias="0.036" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/edit_Text"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@color/black"
+        android:scaleType="centerCrop"
+        android:src="@drawable/edit_on_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.341"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/extracted_text"
+        app:layout_constraintVertical_bias="0.036" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/cropped_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@color/dark_grey"
+        app:shapeAppearanceOverlay="@style/curved"
+        app:strokeColor="@color/grey"
+        app:strokeWidth="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.971"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.025" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

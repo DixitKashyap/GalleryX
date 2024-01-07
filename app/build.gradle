@@ -63,4 +63,14 @@ dependencies {
     //Chrome Tabs Dependency
     implementation 'androidx.browser:browser:1.2.0'
 
+    //Google MlKit TextRecognition,TextLanguageDetection and TextTranslation
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:18.0.2'// For General Purpose TextDetection
+    implementation 'com.google.mlkit:text-recognition-devanagari:16.0.0' //For Recognition of Languages Such as
+                                                                         //Hindi,Marathi,Bengali,Nepali
+    implementation 'com.google.mlkit:language-id:17.0.4' // For Language Detection
+    implementation 'com.google.mlkit:translate:17.0.2' // For Text Translation
+
+    //Image Cropping Library
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+
 }
