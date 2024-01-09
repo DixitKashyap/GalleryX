@@ -22,4 +22,13 @@
     <string name="camera_Qr_Code_Scanner">QR Code</string>
     <string name="camera_QR_Code_Content">QR Code Content</string>
     <string name="camera_text_translator_text_header">Extracted Text</string>
+    <string name="camera_image_info">Details info</string>
+    <string name="image_taken_time_tag">Taken on :</string>
+    <string name="image_taken_time">Image Taken</string>
+    <string name="file_info">File info :</string>
+    <string name="file_info_content">Image Name</string>
+    <string name="file_local_path_tag">Local Path :</string>
+    <string name="file_path">File Path </string>
+    <string name="image_res_and_size">Image Size And Image Resolution</string>
+    <string name="image_res_and_size_tag">Image Info :</string>
 </resources>

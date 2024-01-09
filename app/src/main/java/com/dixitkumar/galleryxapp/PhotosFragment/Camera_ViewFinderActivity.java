@@ -51,6 +51,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.dixitkumar.galleryxapp.ImageViewerActivity;
 import com.dixitkumar.galleryxapp.MainActivity;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityCameraViewfinderBinding;
@@ -73,7 +74,7 @@ import java.util.concurrent.ExecutorService;
 
 @ExperimentalZeroShutterLag public class Camera_ViewFinderActivity extends AppCompatActivity {
      int cameraFacing = CameraSelector.LENS_FACING_BACK;
- ActivityCameraViewfinderBinding viewFinderBinding;
+  ActivityCameraViewfinderBinding viewFinderBinding;
 
     private   ImageCapture imageCapture;
     private ProcessCameraProvider cameraProvider;
@@ -88,7 +89,6 @@ import java.util.concurrent.ExecutorService;
     private static boolean IS_TIME_BURST_ENABLED = false;
     private static String LANGUAGE_CODE = "";
     private static boolean IS_TRANSLATION_MODE_ON = false;
-
      Uri imageUri;
     TextRecognizer textRecognizer;
 
@@ -194,8 +194,20 @@ import java.util.concurrent.ExecutorService;
                  IS_TIME_BURST_ENABLED = false;
              }
          });
-         //Initializing Text Recognition
-        textRecognizer = TextRecognition.getClient(new DevanagariTextRecognizerOptions.Builder().build());
+
+        //Setting Up Picture View Feature
+        viewFinderBinding.viewPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(imageUri!=null){
+                    Intent i = new Intent(Camera_ViewFinderActivity.this, ImageViewerActivity.class);
+                    i.putExtra("IMAGE_URI",imageUri.toString());
+                    startActivity(i);
+                }else{
+                    Toast.makeText(Camera_ViewFinderActivity.this, "Image Uri is Not", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 
@@ -460,6 +472,7 @@ import java.util.concurrent.ExecutorService;
 
 
     protected void setPreview(){
+        int i = 1;
         // Get the path of the most recent image from the public storage
         String[] projection = new String[]{
                 MediaStore.Images.ImageColumns._ID,
@@ -472,9 +485,10 @@ import java.util.concurrent.ExecutorService;
                 .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
                         null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
 
+
 // Get the first image file
         if (cursor.moveToFirst()) {
-            String imageLocation = cursor.getString(1);
+            String imageLocation = cursor.getString(i);
             imageUri = Uri.parse(imageLocation);
             File imageFile = new File(imageLocation);
             if (imageFile.exists()) {

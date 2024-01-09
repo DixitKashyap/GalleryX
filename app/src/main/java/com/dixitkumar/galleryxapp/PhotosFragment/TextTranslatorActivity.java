@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.dixitkumar.galleryxapp.ImageViewerActivity;
 import com.dixitkumar.galleryxapp.MainActivity;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityTextTranslatorBinding;
@@ -41,6 +42,7 @@ import java.io.IOException;
 public class TextTranslatorActivity extends AppCompatActivity {
     private static boolean IS_EDITABLE = false;
     private Uri imageUri;
+    private Uri uri;
     private ActivityTextTranslatorBinding textTranslatorBinding;
 
     private static String LANGUAGE_CODE = "";
@@ -99,6 +101,7 @@ public class TextTranslatorActivity extends AppCompatActivity {
                 IS_EDITABLE = false;
             }
         });
+
     }
 
     private void translateText(){
@@ -153,7 +156,7 @@ public class TextTranslatorActivity extends AppCompatActivity {
 
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                Uri uri = result.getUri();
+                 uri = result.getUri();
                 imageUri = uri;
                 recogniseData();
                 textTranslatorBinding.croppedImage.setImageURI(uri);

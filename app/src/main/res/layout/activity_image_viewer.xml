@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/grey"
+    android:layout_height="match_parent"
+    tools:context=".ImageViewerActivity">
+
+    <LinearLayout
+        android:id="@+id/topPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" >
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/back_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:padding="2dp"
+            android:layout_marginStart="10dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/back_button_icon"
+            android:scaleType="centerInside"
+            android:textAllCaps="false"
+            android:textColor="@color/white"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:padding="3dp"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="2dp"
+            android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/image_clicked_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Image Clicked Time"
+            android:textColor="@color/dark_grey"
+            android:textStyle="bold"
+            android:gravity="start"
+            android:textSize="17dp"
+            />
+            <TextView
+                android:id="@+id/image_clicked_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Image Clicked Time"
+                android:textColor="#828080"
+                android:textStyle="bold"
+                android:textSize="14dp"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/myZoomageView_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/grey"
+        android:fitsSystemWindows="true"
+        app:layout_constraintBottom_toTopOf="@id/bottomPanel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topPanel"
+        app:layout_constraintVertical_bias="0.499">
+
+    <com.jsibbold.zoomage.ZoomageView
+        android:id="@+id/myZoomageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/grey"
+        android:fitsSystemWindows="true"
+        app:zoomage_animateOnReset="true"
+        app:zoomage_autoCenter="true"
+        app:zoomage_autoResetMode="UNDER"
+        app:zoomage_doubleTapToZoom="true"
+        app:zoomage_maxScale="8"
+        app:zoomage_minScale="0.6"
+        android:adjustViewBounds="true"
+        app:zoomage_restrictBounds="false"
+        app:zoomage_translatable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:zoomage_zoomable="true" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/bottomPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/share_image_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:padding="2dp"
+                    android:layout_weight="1"
+                    android:layout_margin="10dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/content_share_icon"
+                    android:scaleType="centerInside"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"/>
+
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/edit_image_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:padding="2dp"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/image_edit_icon"
+                    android:scaleType="centerInside"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"/>
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/favourite_image_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:layout_margin="10dp"
+                    android:background="@android:color/transparent"
+                    android:padding="2dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/favourite_image_empty_icon"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"/>
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/rotate_image_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:padding="2dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/rotate_image_icon"
+            android:scaleType="centerInside"
+            android:textAllCaps="false"
+            android:textColor="@color/white"/>
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/info_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/info_icon"
+            android:textAllCaps="false"
+            android:textColor="@color/white"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
