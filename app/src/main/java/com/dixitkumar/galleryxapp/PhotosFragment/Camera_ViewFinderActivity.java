@@ -86,7 +86,6 @@ import java.util.concurrent.ExecutorService;
     private Handler handler = new Handler();
     private MediaPlayer cameraTime,captureSound;
     private static boolean IS_ENABLED = false;
-    private static boolean IS_TIME_BURST_ENABLED = false;
     private static String LANGUAGE_CODE = "";
     private static boolean IS_TRANSLATION_MODE_ON = false;
      Uri imageUri;
@@ -139,16 +138,9 @@ import java.util.concurrent.ExecutorService;
         }
 
 
-        //Initializing Bottom Sheet Dialog For Menu
-        dialog = new BottomSheetDialog(Camera_ViewFinderActivity.this);
-        topSheetFragmentBinding = TopSheetFragmentBinding.inflate(getLayoutInflater());
-        topSheetFragmentBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
-        //Bottom Sheet Fragment
-        viewFinderBinding.opnCameraMenu.setOnClickListener(v -> {
-
-            dialog.setContentView(topSheetFragmentBinding.getRoot());
-            dialog.show();
-
+      //Setting up Camera Settings Button
+        viewFinderBinding.opnCameraSettings.setOnClickListener(v -> {
+            Toast.makeText(this, "Currently not Available", Toast.LENGTH_SHORT).show();
         });
 
         //Camera QR Code Layout
@@ -175,23 +167,12 @@ import java.util.concurrent.ExecutorService;
 
         //Capture Image after Specific Time delay
          viewFinderBinding.cameraTimer.setOnClickListener(view ->{
-             if(!IS_ENABLED && !IS_TIME_BURST_ENABLED && !IS_TRANSLATION_MODE_ON){
+             if(!IS_ENABLED &&  !IS_TRANSLATION_MODE_ON){
                  viewFinderBinding.cameraTimer.setImageResource(R.drawable.time_off_icon);
                  IS_ENABLED = true;
              }else{
                  viewFinderBinding.cameraTimer.setImageResource(R.drawable.time_burst_icon);
                  IS_ENABLED = false;
-             }
-         });
-
-         //Setting Up The Camera Time Burst Mode
-         viewFinderBinding.timeBurstMode.setOnClickListener(view -> {
-             if(!IS_TIME_BURST_ENABLED && !IS_ENABLED &&!IS_TRANSLATION_MODE_ON){
-                 viewFinderBinding.timeBurstMode.setTextColor(ContextCompat.getColor(this,R.color.light_blue));
-                 IS_TIME_BURST_ENABLED = true;
-             }else{
-                 viewFinderBinding.timeBurstMode.setTextColor(ContextCompat.getColor(this,R.color.white));
-                 IS_TIME_BURST_ENABLED = false;
              }
          });
 
@@ -232,6 +213,9 @@ import java.util.concurrent.ExecutorService;
                 return true;
             case KeyEvent.KEYCODE_VOLUME_UP:
                 setIsEnabled(IS_ENABLED);
+                return true;
+            case KeyEvent.KEYCODE_BACK:
+                onBackPressed();
                 return true;
             default:
                 return super.onKeyUp(keyCode, event);
@@ -282,15 +266,6 @@ import java.util.concurrent.ExecutorService;
                             captureImage(imageCapture);
                             cameraTime.stop();
                         }, 5000);
-                    }else if(IS_TIME_BURST_ENABLED){
-                        for(int i=0;i<5;i++) {
-                            handler.postAtTime((Runnable) () -> {
-                                if (ContextCompat.checkSelfPermission(Camera_ViewFinderActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                    activityResultLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                                }
-                                captureImage(imageCapture);
-                            }, 2000);
-                        }
                     }else if(IS_TRANSLATION_MODE_ON){
                         captureImage(imageCapture);
                        // Setting up the Translator mode
@@ -337,7 +312,7 @@ import java.util.concurrent.ExecutorService;
 
         viewFinderBinding.translateModeOn.setOnClickListener(view -> {
 
-            if(!IS_TRANSLATION_MODE_ON && imageCapture.getFlashMode()==ImageCapture.FLASH_MODE_OFF && !IS_ENABLED && !IS_TIME_BURST_ENABLED){
+            if(!IS_TRANSLATION_MODE_ON && imageCapture.getFlashMode()==ImageCapture.FLASH_MODE_OFF && !IS_ENABLED ){
                 viewFinderBinding.translateModeOn.setImageResource(R.drawable.translate_icon_on);
                 IS_TRANSLATION_MODE_ON = true;
             }else{
@@ -507,8 +482,8 @@ import java.util.concurrent.ExecutorService;
         QrCodeDialog = new BottomSheetDialog(Camera_ViewFinderActivity.this);
         qrCodeLayoutBinding = QrCodeLayoutBinding.inflate(getLayoutInflater());
         qrCodeLayoutBinding.getRoot().setBackgroundColor(ContextCompat.getColor(this,R.color.white));
-        dialog.setContentView(qrCodeLayoutBinding.getRoot());
-        dialog.show();
+        QrCodeDialog.setContentView(qrCodeLayoutBinding.getRoot());
+        QrCodeDialog.show();
     }
 
     @Override
@@ -601,5 +576,6 @@ import java.util.concurrent.ExecutorService;
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        finish();
     }
 }

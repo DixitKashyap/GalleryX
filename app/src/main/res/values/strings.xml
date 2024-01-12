@@ -31,4 +31,22 @@
     <string name="file_path">File Path </string>
     <string name="image_res_and_size">Image Size And Image Resolution</string>
     <string name="image_res_and_size_tag">Image Info :</string>
+    <string name="image_editor_cancel_button">Cancel</string>
+    <string name="image_editor_save_button">Save</string>
+    <string name="image_editor_auto_mode">Auto</string>
+    <string name="image_editor_crop_mode">Crop</string>
+    <string name="image_editor_filter_mode">Filter</string>
+    <string name="image_editor_adjust_mode">Adjust</string>
+    <string name="image_filter_Filter_tag">Filter</string>
+    <string name="image_filter_popular_Tag">Popular</string>
+    <string name="image_filter_one">Filter 1</string>
+    <string name="image_filter_two">Filter 2</string>
+    <string name="image_filter_three">Filter 3</string>
+    <string name="image_filter_four">Filter 4</string>
+    <string name="image_filter_five">Filter 5</string>
+    <string name="image_filter_six">Filter 6</string>
+    <string name="image_filter_seven">Filter 7</string>
+    <string name="image_filter_eight">Filter 8</string>
+    <string name="image_filter_nine">Filter 9</string>
+    <string name="image_filter_ten">Filter 10</string>
 </resources>

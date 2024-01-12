@@ -94,7 +94,7 @@
                 </androidx.appcompat.widget.AppCompatImageButton>
 
                 <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/opn_camera_menu"
+                    android:id="@+id/opn_camera_settings"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="2dp"
@@ -157,6 +157,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/black"
+                android:layout_gravity="center"
                 android:orientation="horizontal"
                 >
                 <androidx.appcompat.widget.AppCompatButton
@@ -164,6 +165,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="2dp"
+                    android:layout_weight="1"
                     android:layout_margin="2dp"
                     android:background="@color/black"
                     android:text="@string/camera_Qr_Code_Scanner"
@@ -176,6 +178,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="2dp"
+                    android:layout_weight="1"
                     android:layout_margin="2dp"
                     android:background="@color/black"
                     android:text="@string/camera_video"
@@ -187,21 +190,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="2dp"
+                    android:layout_weight="1"
                     android:layout_margin="2dp"
                     android:background="@color/black"
                     android:text="@string/camera_photos"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white">
-                </androidx.appcompat.widget.AppCompatButton>
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/time_burst_mode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="2dp"
-                    android:layout_margin="2dp"
-                    android:background="@color/black"
-                    android:text="@string/camera_time_burst"
                     android:textAllCaps="false"
                     android:textColor="@color/white">
                 </androidx.appcompat.widget.AppCompatButton>
@@ -243,12 +235,7 @@
                 app:iconSize="50dp"
                 app:iconTint="@color/white"
                 app:icon="@drawable/camera_icon"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.895" />
+            />
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/cameraFlip"

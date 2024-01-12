@@ -1,28 +1,42 @@
 package com.dixitkumar.galleryxapp;
 
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.video.FileOutputOptions;
 import androidx.exifinterface.media.ExifInterface;
 
+import com.dixitkumar.galleryxapp.PhotosFragment.TextTranslatorActivity;
 import com.dixitkumar.galleryxapp.PhotosFragment.image_detail_Activity;
-import com.dixitkumar.galleryxapp.databinding.ActivityImageDetailBinding;
 import com.dixitkumar.galleryxapp.databinding.ActivityImageViewerBinding;
+import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class ImageViewerActivity extends AppCompatActivity {
 
@@ -34,6 +48,9 @@ public class ImageViewerActivity extends AppCompatActivity {
    private ActivityImageViewerBinding imageViewerBinding ;
    private int imageRotation = 0;
    private String filePath="";
+   private File imageFile ;
+   private  Bitmap bitmap;
+   private static boolean IsImageFavouriteSelected = false;
     int imageNumber=1;
 
 
@@ -47,6 +64,7 @@ public class ImageViewerActivity extends AppCompatActivity {
         //getting image data
         i = getIntent();
         String uri = i.getStringExtra("IMAGE_URI");
+        imageFile = new File(uri);
         imageUri = Uri.parse(uri);
         imageViewerBinding.myZoomageView.setImageURI(imageUri);
 
@@ -73,7 +91,7 @@ public class ImageViewerActivity extends AppCompatActivity {
                 filePath = i.getStringExtra("IMAGE_URI");
                 FileInputStream inputStream = new FileInputStream(filePath);
                 Log.d("TAG",inputStream.toString());
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                bitmap = BitmapFactory.decodeStream(inputStream);
 
                 // Create a new matrix
                 Matrix matrix = new Matrix();
@@ -110,7 +128,77 @@ public class ImageViewerActivity extends AppCompatActivity {
            i.putExtra("IMAGE_URI",imageUri.toString());
            startActivity(i);
         });
+
+        //Setting Up The Image Edit Button
+        imageViewerBinding.translateImageButton.setOnClickListener(view -> {
+           Intent i = new Intent(ImageViewerActivity.this, TextTranslatorActivity.class);
+           i.putExtra("IMAGE_URI",imageUri.toString());
+           startActivity(i);
+        });
+
+        //Setting Up Favourite Image Button
+        imageViewerBinding.favouriteImageButton.setOnClickListener(view -> {
+            if(!IsImageFavouriteSelected){
+                imageViewerBinding.favouriteImageButton.setImageResource(R.drawable.favourite_image_filled_icon);
+                IsImageFavouriteSelected = true;
+            }else{
+                imageViewerBinding.favouriteImageButton.setImageResource(R.drawable.favourite_image_empty_icon);
+                IsImageFavouriteSelected = false;
+            }
+        });
+
+        imageViewerBinding.cropImageButton.setOnClickListener(view -> {
+            CropImage.activity(Uri.fromFile(imageFile)).start(ImageViewerActivity.this);
+        });
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri uri = result.getUri();
+
+                try {
+                    Bitmap imageBitmap;
+                    OutputStream outputStream;
+
+                    FileInputStream inputStream = new FileInputStream(uri.getPath());
+                    imageBitmap = BitmapFactory.decodeStream(inputStream);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+                        ContentResolver resolver = getContentResolver();
+                        ContentValues contentValues = new ContentValues();
+
+                        String name = System.currentTimeMillis() + "";
+                        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "Image_" + name + ".jpg");
+                        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + "CroppedImages");
+
+                        Uri croppedImageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues);
+
+                        outputStream = resolver.openOutputStream(Objects.requireNonNull(croppedImageUri));
+
+                        imageBitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+                        Objects.requireNonNull(outputStream);
+                        Toast.makeText(this, "Image Saved", Toast.LENGTH_SHORT).show();
+
+                    }
+
+                }catch (Exception e){
+
+                }
+
+            } else {
+                Toast.makeText(this, "Resulted Error", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "Error While Cropping The Image", Toast.LENGTH_SHORT).show();
+        }
+        }
 
     @Override
     public void onBackPressed() {
