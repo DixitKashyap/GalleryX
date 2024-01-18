@@ -5,5 +5,14 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
+
     <style name="Theme.GalleryXApp" parent="Base.Theme.GalleryXApp" />
+
+<!-- Video view theme   -->
+    <style name="playerActivityTheme" parent="Theme.MaterialComponents.Light.NoActionBar"/>
+
+<!--  For Alert Dialog   -->
+    <style name="alterDialog" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

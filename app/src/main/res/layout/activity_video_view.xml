@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PhotosFragment.VideoActivity">
+    tools:context=".PhotosFragment.VideoViewActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -64,33 +64,37 @@
         android:id="@+id/Flip_Button"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/video_camera_flip_icon"
-        android:scaleType="centerCrop"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_alignRight="@id/record_button"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="65dp"
-        android:layout_alignRight="@id/record_button"
-        android:layout_marginTop="60dp"
+        android:layout_marginStart="65dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginEnd="65dp"
         android:layout_marginRight="10dp"
-        />
+        android:layout_marginBottom="65dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerCrop"
+        android:src="@drawable/video_camera_flip_icon" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/image_view_background"
+        android:id="@+id/video_view_preview"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:shapeAppearanceOverlay="@style/curved"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/dark_grey"
+        android:background="@color/grey"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="65dp"
+        android:layout_margin="53dp"
         />
 
-   <LinearLayout
-       android:id="@+id/bottom_linearLayout"
-       android:layout_width="match_parent"
-       android:layout_height="30dp"
-       android:background="@color/black"
-       android:orientation="horizontal"
-       android:layout_alignParentBottom="true"
-/>
-
+    <LinearLayout
+        android:id="@+id/bottom_linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@color/black"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        />
 </RelativeLayout>

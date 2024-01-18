@@ -39,14 +39,20 @@
     <string name="image_editor_adjust_mode">Adjust</string>
     <string name="image_filter_Filter_tag">Filter</string>
     <string name="image_filter_popular_Tag">Popular</string>
-    <string name="image_filter_one">Filter 1</string>
-    <string name="image_filter_two">Filter 2</string>
-    <string name="image_filter_three">Filter 3</string>
-    <string name="image_filter_four">Filter 4</string>
-    <string name="image_filter_five">Filter 5</string>
-    <string name="image_filter_six">Filter 6</string>
-    <string name="image_filter_seven">Filter 7</string>
-    <string name="image_filter_eight">Filter 8</string>
-    <string name="image_filter_nine">Filter 9</string>
-    <string name="image_filter_ten">Filter 10</string>
+    <string name="allVideoText">Total Videos : </string>
+    <string name="video_title">Video_Title</string>
+    <string name="video_size">Size : </string>
+    <string name="video_duration">duration</string>
+    <string name="videos_Tag">Videos</string>
+
+    <string name="lock">Lock_Icon</string>
+    <string name="back_btn">Back Button</string>
+    <string name="menu">Menu</string>
+
+    <string name="audio_track_button">Audio Track</string>
+    <string name="subtitle_text">Subtitle</string>
+    <string name="audio_booster_text">Audio Booster</string>
+    <string name="video_speed_text">Speed</string>
+    <string name="sleep_timer_text">Sleep Timer </string>
+    <string name="picture_in_picture_mode">Pip Mode</string>
 </resources>

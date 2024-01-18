@@ -1,0 +1,112 @@
+package com.dixitkumar.galleryxapp.AlbumFragment;
+
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.dixitkumar.galleryxapp.R;
+import com.dixitkumar.galleryxapp.databinding.RecyclerviewItemVideosBinding;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.common.primitives.Bytes;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+
+public class VideoRecyclerviewAdapter extends RecyclerView.Adapter<VideoRecyclerviewAdapter.ViewHolder> {
+
+    private Context context;
+    protected static ArrayList<Video> videoArrayList;
+
+    VideoRecyclerviewAdapter(Context context,ArrayList<Video> videoArrayList){
+        this.context = context;
+        this.videoArrayList = videoArrayList;
+    }
+
+    protected void setFilteredList(ArrayList<Video> filteredList){
+        this.videoArrayList = filteredList;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ViewHolder(RecyclerviewItemVideosBinding.inflate(LayoutInflater.from(context),parent,false));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.video_title.setSelected(true);
+      holder.video_title.setText(videoArrayList.get(position).getTitle());
+      holder.videoThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Glide.with(context)
+                .load(videoArrayList.get(position).getArtUri())
+                .apply(RequestOptions.placeholderOf(R.color.black))
+                .into(holder.videoThumbnail);
+
+
+        String videoDuration = Video.formatTime(videoArrayList.get(position).getDuration());
+        holder.video_duration.setText(videoDuration);
+
+        long videoSizeInBytes = Long.parseLong(videoArrayList.get(position).getSize());
+        double videoInKiloBytes = (double)videoSizeInBytes/1024;
+        double videoInMegaBytes = (double)videoInKiloBytes/1024;
+        String imageSize = String.valueOf(videoInMegaBytes).substring(0,4)+"MB";
+        holder.video_size.setText(imageSize+"");
+
+        //Setting Up Click Listener
+        holder.videoView.setOnClickListener(view -> {
+            Intent i = new Intent(context, VideoPlayerActivity.class);
+            VideoPlayerActivity.pipStatus = 1;
+            VideoPlayerActivity.pos = position;
+            i.putExtra("POS",position);
+            context.startActivity(i);
+        });
+
+        //Setting Up The Share Button
+        holder.shareButton.setOnClickListener(view -> {
+            Toast.makeText(context, videoArrayList.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+        });
+
+        //Setting Up The Search View in AllVideo List
+    }
+
+    @Override
+    public int getItemCount() {
+        return videoArrayList.size();
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder{
+
+        LinearLayout videoView;
+        ShapeableImageView videoThumbnail;
+        TextView video_title;
+        TextView video_size;
+        TextView video_duration;
+        ImageView shareButton;
+
+        public ViewHolder(@NonNull RecyclerviewItemVideosBinding itemVideosBinding) {
+            super(itemVideosBinding.getRoot());
+            this.videoView = itemVideosBinding.getRoot();
+
+            this.videoThumbnail = itemVideosBinding.videoThumbnail;
+            this.video_title = itemVideosBinding.videTitle;
+            this.video_size = itemVideosBinding.videoSize;
+            this.video_duration = itemVideosBinding.videoDuration;
+            this.shareButton = itemVideosBinding.shareVideos;
+        }
+    }
+}

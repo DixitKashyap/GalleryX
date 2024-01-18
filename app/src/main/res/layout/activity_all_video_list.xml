@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey"
+    android:orientation="vertical"
+    tools:context=".AlbumFragment.AllVideoListActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView_Videos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:padding="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_for_search_view"
+            android:textColorHighlight="@color/yellow_note_dull"
+            android:baselineAligned="false"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search Here....">
+
+        </androidx.appcompat.widget.SearchView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/video_sorting_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:icon="@drawable/sort_button_icon"
+            android:text="@string/audio_track_button"
+            app:iconGravity="top"
+            android:layout_margin="10dp"
+            android:layout_marginBottom="2dp"
+            android:textColor="@color/white"
+            app:iconTint="@color/dark_grey"
+            app:iconSize="25dp"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/refresh_video_list"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:icon="@drawable/refresh_icon"
+            android:text="@string/audio_track_button"
+            app:iconGravity="top"
+            android:layout_margin="10dp"
+            android:layout_marginBottom="2dp"
+            android:textColor="@color/white"
+            app:iconTint="@color/dark_grey"
+            app:iconSize="25dp"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/video_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+
+        />
+
+</LinearLayout>

@@ -1,5 +1,27 @@
 package com.dixitkumar.galleryxapp.PhotosFragment;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.View;
+import android.webkit.URLUtil;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -21,52 +43,18 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.ActivityNotFoundException;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
-import android.view.View;
-import android.view.Window;
-import android.webkit.URLUtil;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.dixitkumar.galleryxapp.ImageViewerActivity;
-import com.dixitkumar.galleryxapp.MainActivity;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityCameraViewfinderBinding;
 import com.dixitkumar.galleryxapp.databinding.QrCodeLayoutBinding;
-import com.dixitkumar.galleryxapp.databinding.TopSheetFragmentBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-import com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -109,7 +97,6 @@ import java.util.concurrent.ExecutorService;
     //Camera QrCode Bottom Sheet Fragment
     private BottomSheetDialog QrCodeDialog;
     private QrCodeLayoutBinding qrCodeLayoutBinding;
-    private TopSheetFragmentBinding topSheetFragmentBinding;
 
 
     //Translator Bottom Sheet Fragment
@@ -129,7 +116,6 @@ import java.util.concurrent.ExecutorService;
 
         //setting up the camera Preview
         setPreview();
-
         //Check The Necessary Permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             activityResultLauncher.launch(Manifest.permission.CAMERA);
@@ -159,9 +145,7 @@ import java.util.concurrent.ExecutorService;
         viewFinderBinding.videoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Camera_ViewFinderActivity.this, VideoActivity.class);
-                startActivity(i);
-                finish();
+              startActivity(new Intent(Camera_ViewFinderActivity.this, VideoViewActivity.class));
             }
         });
 
@@ -409,6 +393,12 @@ import java.util.concurrent.ExecutorService;
         } else {
             return AspectRatio.RATIO_16_9;
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        startCamera(cameraFacing);
     }
 
     @SuppressLint("RestrictedApi")

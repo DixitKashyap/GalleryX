@@ -76,4 +76,11 @@ dependencies {
     //Zoomable Image Viewer Library
     implementation 'com.jsibbold:zoomage:1.3.1'
 
+    //Video Player
+    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
+
+    //for vertical progress bar
+    implementation 'com.github.lukelorusso:VerticalSeekbar:1.2.7'
+
+
 }
