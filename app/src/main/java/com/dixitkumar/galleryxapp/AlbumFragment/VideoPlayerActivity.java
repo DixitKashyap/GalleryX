@@ -6,10 +6,13 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
+import android.app.Activity;
 import android.app.AppOpsManager;
 import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.LoudnessEnhancer;
 import android.net.Uri;
@@ -87,6 +90,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
          i  = getIntent();
         videoPosition =i.getIntExtra("POS",0);
 
+
         //Getting Up The Tracks From Video Files
         defaultTrackSelector = new DefaultTrackSelector(this);
         player =  new SimpleExoPlayer.Builder(this).setTrackSelector(defaultTrackSelector).build();
@@ -104,7 +108,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 playVideo();
             }
         });
-
 
         //Setting Up The Next Button
         playerBinding.nextBtn.setOnClickListener(view -> {
@@ -365,6 +368,16 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
 
         });
+
+        //Setting Up The Video Player Screen Orientation Button
+        playerBinding.orientationBtn.setOnClickListener(view -> {
+
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            }else{
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            }
+        });
     }
     private void nextPrevVideo(boolean isNext){
      if(isNext){
@@ -433,7 +446,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
         playVideo();
 
 
-
     }
 
 
@@ -496,6 +508,23 @@ public class VideoPlayerActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isInPictureInPictureMode()) {
+            pauseVideo();
+        }
+        pauseVideo();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        playVideo();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.dixitkumar.galleryxapp.PhotosFragment.Images;
 import com.dixitkumar.galleryxapp.PhotosFragment.Photos_Fragment;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.FragmentAlbumBinding;
@@ -40,7 +41,6 @@ public class Album_Fragment extends Fragment {
     public static Uri artUri;
     private int totalVideos =0;
     public static ArrayList<Video> videoArrayList = new ArrayList<>();
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -50,6 +50,7 @@ public class Album_Fragment extends Fragment {
         if(requestRuntimePermission()){
             requestRuntimePermission();
         }else {
+            //Getting All The video From Storage
             videoArrayList = getAllVideo();
             totalVideos = videoArrayList.size();
             artUri = videoArrayList.get(totalVideos-1).getArtUri();
@@ -60,7 +61,6 @@ public class Album_Fragment extends Fragment {
                     .apply(RequestOptions.placeholderOf(R.color.black))
                     .into(albumBinding.videoThumbnail);
         }
-
         albumBinding.getRoot().setOnClickListener(view -> {
           getContext().startActivity(new Intent(getContext(), AllVideoListActivity.class));
         });

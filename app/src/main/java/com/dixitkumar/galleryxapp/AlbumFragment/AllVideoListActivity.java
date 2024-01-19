@@ -70,23 +70,6 @@ public class AllVideoListActivity extends AppCompatActivity {
             }
         });
 
-
-//        Setting Up Video Sorting Option
-        videoListBinding.videoSortingButton.setOnClickListener(view -> {
-          String[] menuItem = {"Names(A to Z)","File Size(Smallest)","File Size(Largest)"};
-            AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-                    .setTitle("Sort By")
-                    .setPositiveButton("Ok", (dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                    })
-                    .setSingleChoiceItems(menuItem, 0, (dialogInterface, i) -> {
-                        sortValue = i;
-
-                    })
-                    .create();
-            dialog.show();
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(R.color.light_blue);
-        });
     }
 
 

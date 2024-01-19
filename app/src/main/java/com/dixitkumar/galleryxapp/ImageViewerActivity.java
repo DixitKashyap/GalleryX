@@ -11,31 +11,27 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.video.FileOutputOptions;
 import androidx.exifinterface.media.ExifInterface;
 
 import com.dixitkumar.galleryxapp.PhotosFragment.TextTranslatorActivity;
-import com.dixitkumar.galleryxapp.PhotosFragment.image_detail_Activity;
 import com.dixitkumar.galleryxapp.databinding.ActivityImageViewerBinding;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 public class ImageViewerActivity extends AppCompatActivity {
@@ -64,24 +60,15 @@ public class ImageViewerActivity extends AppCompatActivity {
         //getting image data
         i = getIntent();
         String uri = i.getStringExtra("IMAGE_URI");
+        Log.d("TAG",uri);
         imageFile = new File(uri);
         imageUri = Uri.parse(uri);
         imageViewerBinding.myZoomageView.setImageURI(imageUri);
 
-       //Setting Up date and Time
-       String imageData = getImageDate(uri);
-       //Setting up Date
-        if(formattedDate!=null) {
-            formattedDate = formatDate(imageData);
-            imageViewerBinding.imageClickedDate.setText(formattedDate);
-        }
-        //Setting Up Time
-        if(formattedTime!=null){
-            formattedTime = formatTime(imageData);
-            imageViewerBinding.imageClickedTime.setText(formattedTime);
-        }
 
-        //Setting on Back Button Listener
+        //Setting Up Folder Name
+        imageViewerBinding.imageClickedDate.setText(imageFile.getParentFile().getName()+"");
+         //Setting on Back Button Listener
         imageViewerBinding.backButton.setOnClickListener(view -> onBackPressed());
 
         //Setting up image rotation Listener
@@ -119,14 +106,6 @@ public class ImageViewerActivity extends AppCompatActivity {
             }else{
                 Toast.makeText(this, "Not Valid Image Reference", Toast.LENGTH_SHORT).show();
             }
-        });
-
-
-        //Setting Up The Info Button
-        imageViewerBinding.infoButton.setOnClickListener(view -> {
-           Intent i = new Intent(ImageViewerActivity.this, image_detail_Activity.class);
-           i.putExtra("IMAGE_URI",imageUri.toString());
-           startActivity(i);
         });
 
         //Setting Up The Image Edit Button
@@ -204,46 +183,4 @@ public class ImageViewerActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
     }
-
-    //For Formatting DateAndTime
-     public static String formatDate(String str) {
-        SimpleDateFormat readFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-        Date date = null;
-        try {
-            date = readFormat.parse(str);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        SimpleDateFormat writeFormat = new SimpleDateFormat("MMMM d,yyyy ");
-        String formattedDate = writeFormat.format(date);
-        return formattedDate;
-    }
-
-    public static String formatTime(String str){
-        SimpleDateFormat readFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-        Date date = null;
-        try {
-            date = readFormat.parse(str);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-        SimpleDateFormat writeFormat = new SimpleDateFormat("HH:mm");
-        String formattedTime = writeFormat.format(date);
-
-        return formattedTime;
-    }
-
-
-
-    public static String getImageDate(String imagePath) {
-        try {
-            ExifInterface exif = new ExifInterface(imagePath);
-            return exif.getAttribute(ExifInterface.TAG_DATETIME);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 }

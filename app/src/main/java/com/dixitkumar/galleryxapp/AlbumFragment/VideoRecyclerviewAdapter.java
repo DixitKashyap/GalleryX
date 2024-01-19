@@ -76,12 +76,8 @@ public class VideoRecyclerviewAdapter extends RecyclerView.Adapter<VideoRecycler
             context.startActivity(i);
         });
 
-        //Setting Up The Share Button
-        holder.shareButton.setOnClickListener(view -> {
-            Toast.makeText(context, videoArrayList.get(position).getTitle(), Toast.LENGTH_SHORT).show();
-        });
-
-        //Setting Up The Search View in AllVideo List
+      //Setting Up The Folder Name
+        holder.folder_name.setText(videoArrayList.get(position).getFolderName());
     }
 
     @Override
@@ -96,7 +92,8 @@ public class VideoRecyclerviewAdapter extends RecyclerView.Adapter<VideoRecycler
         TextView video_title;
         TextView video_size;
         TextView video_duration;
-        ImageView shareButton;
+
+        TextView folder_name;
 
         public ViewHolder(@NonNull RecyclerviewItemVideosBinding itemVideosBinding) {
             super(itemVideosBinding.getRoot());
@@ -106,7 +103,7 @@ public class VideoRecyclerviewAdapter extends RecyclerView.Adapter<VideoRecycler
             this.video_title = itemVideosBinding.videTitle;
             this.video_size = itemVideosBinding.videoSize;
             this.video_duration = itemVideosBinding.videoDuration;
-            this.shareButton = itemVideosBinding.shareVideos;
+            this.folder_name = itemVideosBinding.folderName;
         }
     }
 }
