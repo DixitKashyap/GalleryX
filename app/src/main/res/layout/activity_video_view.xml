@@ -80,14 +80,16 @@
         android:id="@+id/video_view_preview"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        app:shapeAppearanceOverlay="@style/curved"
-        app:strokeWidth="2dp"
-        app:strokeColor="@color/dark_grey"
-        android:background="@color/grey"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="53dp"
-        />
+        android:layout_marginStart="53dp"
+        android:layout_marginTop="53dp"
+        android:layout_marginEnd="53dp"
+        android:layout_marginBottom="53dp"
+        android:background="@color/grey"
+        app:shapeAppearanceOverlay="@style/curved"
+        app:strokeColor="@color/dark_grey"
+        app:strokeWidth="2dp" />
 
     <LinearLayout
         android:id="@+id/bottom_linearLayout"
@@ -97,4 +99,18 @@
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         />
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/video_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:textSize="20dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="175dp"
+        android:text="00:00"
+        android:textColor="@color/white"
+        android:layout_marginBottom="300dp"/>
+
 </RelativeLayout>

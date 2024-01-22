@@ -37,9 +37,7 @@ import java.util.List;
 public class AllVideoListActivity extends AppCompatActivity {
 
     private VideoRecyclerviewAdapter adapter;
-    private ArrayList<Video> videoArrayList = new ArrayList<>();
     private ActivityAllVideoListBinding videoListBinding;
-    private int sortValue = 0;
     @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +47,14 @@ public class AllVideoListActivity extends AppCompatActivity {
 
         //Setting Up The RecyclerView
         videoListBinding.videoRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        videoArrayList = Album_Fragment.videoArrayList;
+
 
         //Setting Up The Adapter
-        adapter = new VideoRecyclerviewAdapter(AllVideoListActivity.this,videoArrayList);
+        adapter = new VideoRecyclerviewAdapter(AllVideoListActivity.this);
         videoListBinding.videoRecyclerView.setAdapter(adapter);
 
 
-               //Setting Up The Video Search View
+        //Setting Up The Video Search View
         videoListBinding.searchViewVideos.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -72,10 +70,9 @@ public class AllVideoListActivity extends AppCompatActivity {
 
     }
 
-
     private void searchFilter(String nextText){
         ArrayList<Video> filteredList = new ArrayList<>();
-        for(Video video : videoArrayList){
+        for(Video video : Photos_Fragment.AllVideoList){
             if(video.getTitle().toLowerCase().contains(nextText.toLowerCase())){
                 filteredList.add(video);
             }

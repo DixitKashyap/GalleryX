@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.AppOpsManager;
@@ -26,6 +27,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.dixitkumar.galleryxapp.PhotosFragment.Photos_Fragment;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.ActivityVideoPlayerBinding;
 import com.dixitkumar.galleryxapp.databinding.AudioBoosterLayoutBinding;
@@ -62,9 +64,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private LoudnessEnhancer enhancer ;
     private static Float video_speed= 1.0f;
     private Timer timer ;
-    protected static int pipStatus = 1;
-    protected static int pos = 0;
+    public static int pipStatus = 1;
+    public static int pos = 0;
 
+    public static boolean fromVideoView = false;
     Intent i ;
     private static DefaultTrackSelector defaultTrackSelector ;
     @Override
@@ -89,7 +92,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
          i  = getIntent();
         videoPosition =i.getIntExtra("POS",0);
-
 
         //Getting Up The Tracks From Video Files
         defaultTrackSelector = new DefaultTrackSelector(this);
@@ -392,14 +394,14 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private void setPosition(boolean isIncrement){
        if(!isRepeat){
            if(isIncrement){
-               if(Album_Fragment.videoArrayList.size()-1 == videoPosition){
+               if(VideoRecyclerviewAdapter.videoArrayList.size()-1 == videoPosition){
                    videoPosition = 0;
                }else{
                    ++videoPosition;
                }
            }else{
                if(videoPosition == 0){
-                   videoPosition = Album_Fragment.videoArrayList.size()-1;
+                   videoPosition = VideoRecyclerviewAdapter.videoArrayList.size()-1;
                }else{
                    --videoPosition;
                }
@@ -421,6 +423,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         else{playerBinding.repeatBtn.setImageResource(R.drawable.repeat_off_icon);}
         video_speed = 1.0f;
         playerBinding.videoTitle.setSelected(true);
+
         playerBinding.videoTitle.setText(VideoRecyclerviewAdapter.videoArrayList.get(videoPosition).getTitle());
         MediaItem mediaItem = MediaItem.fromUri(VideoRecyclerviewAdapter.videoArrayList.get(videoPosition).getArtUri());
         player.setMediaItems(Collections.singletonList(mediaItem));
@@ -432,7 +435,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 Player.Listener.super.onPlayerStateChanged(playWhenReady, playbackState);
-                if(playbackState == Player.STATE_ENDED){
+                if(playbackState == Player.STATE_ENDED && fromVideoView == false){
                     nextPrevVideo(true);
                 }
             }

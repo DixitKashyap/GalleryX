@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.dixitkumar.galleryxapp.PhotosFragment.Photos_Fragment;
 import com.dixitkumar.galleryxapp.R;
 import com.dixitkumar.galleryxapp.databinding.RecyclerviewItemVideosBinding;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -29,11 +30,10 @@ import java.util.ArrayList;
 public class VideoRecyclerviewAdapter extends RecyclerView.Adapter<VideoRecyclerviewAdapter.ViewHolder> {
 
     private Context context;
-    protected static ArrayList<Video> videoArrayList;
+    public static ArrayList<Video> videoArrayList= Photos_Fragment.AllVideoList;
 
-    VideoRecyclerviewAdapter(Context context,ArrayList<Video> videoArrayList){
+    VideoRecyclerviewAdapter(Context context){
         this.context = context;
-        this.videoArrayList = videoArrayList;
     }
 
     protected void setFilteredList(ArrayList<Video> filteredList){

@@ -82,5 +82,7 @@ dependencies {
     //for vertical progress bar
     implementation 'com.github.lukelorusso:VerticalSeekbar:1.2.7'
 
+    //for handling storage permission
+    implementation 'com.karumi:dexter:6.2.3'
 
 }

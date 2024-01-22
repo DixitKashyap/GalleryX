@@ -109,11 +109,10 @@ import java.util.concurrent.ExecutorService;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewFinderBinding = ActivityCameraViewfinderBinding.inflate(getLayoutInflater());
+        setTheme(R.style.CameraTheme);
         setContentView(viewFinderBinding.getRoot());
 
-        //Capture Image on Click of A Volume Button
         takeKeyEvents(true);
-
         //setting up the camera Preview
         setPreview();
         //Check The Necessary Permission
@@ -192,12 +191,6 @@ import java.util.concurrent.ExecutorService;
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-               setIsEnabled(IS_ENABLED);
-                return true;
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                setIsEnabled(IS_ENABLED);
-                return true;
             case KeyEvent.KEYCODE_BACK:
                 onBackPressed();
                 return true;

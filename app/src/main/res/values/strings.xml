@@ -56,4 +56,12 @@
     <string name="sleep_timer_text">Sleep Timer </string>
     <string name="picture_in_picture_mode">Pip Mode</string>
     <string name="folder_name">Folder Name</string>
+
+    <string name="all_images">All Images</string>
+    <string name="all_screenshots">Screenshots</string>
+    <string name="cropped_Images">Cropped Images</string>
+    <string name="gallery_X_images">GalleryX Images</string>
+    <string name="local_storage_images">Local Images</string>
+    <string name="camera_images">Camera Images</string>
+
 </resources>
