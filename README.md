@@ -5,8 +5,6 @@
 <b>Simple Gallery App with Build-in Camera,Video Recorder and Video Player.</b><br>
 
 <b>Screenshots Of GalleryXApp : 
-![Uploading Screenshot_2024-01-23-22-58-01-799_com.dixitkumar.galleryxapp.jpg…]()
-
 
 
 <b> Features : </b>
