@@ -1,5 +1,5 @@
 # GalleryXApp
-[![status](https://img.shields.io)](https://img.shields.io/badge/Status-Active-brightgreen)
+![status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![Java](https://img.shields.io/badge/Java-100%25-brightgreen)
 
 <b>Simple Gallery App with Build-in Camera,Video Recorder and Video Player.</b><br>
