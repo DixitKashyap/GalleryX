@@ -66,6 +66,7 @@ public class Photos_Fragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        imagesArrayList.clear();
         getAllImages();
     }
 

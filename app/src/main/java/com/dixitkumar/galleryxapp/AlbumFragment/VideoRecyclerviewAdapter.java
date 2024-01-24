@@ -1,7 +1,9 @@
 package com.dixitkumar.galleryxapp.AlbumFragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +50,7 @@ public class VideoRecyclerviewAdapter extends RecyclerView.Adapter<VideoRecycler
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.video_title.setSelected(true);
       holder.video_title.setText(videoArrayList.get(position).getTitle());
       holder.videoThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -74,6 +76,15 @@ public class VideoRecyclerviewAdapter extends RecyclerView.Adapter<VideoRecycler
             VideoPlayerActivity.pos = position;
             i.putExtra("POS",position);
             context.startActivity(i);
+        });
+
+        //Sharing Video On Long Click
+        holder.videoView.setOnLongClickListener(view -> {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("video/*");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(videoArrayList.get(position).getPath()));
+            context.startActivity(Intent.createChooser(shareIntent,"Share Music File!!"));
+            return true;
         });
 
       //Setting Up The Folder Name

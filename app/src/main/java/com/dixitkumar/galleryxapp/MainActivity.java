@@ -50,4 +50,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    @Override
+    public void onBackPressed() {
+        if (mainBinding.viewPager2.getCurrentItem() != 0) {
+            // If the current view is not the first page,
+            // then navigate to the previous page
+            mainBinding.viewPager2.setCurrentItem(mainBinding.viewPager2.getCurrentItem() - 1);
+        } else {
+            // If the current view is the first page,
+            // then proceed with the normal handling of the back button (i.e., close the app)
+            super.onBackPressed();
+            onDestroy();
+        }
+    }
+
 }

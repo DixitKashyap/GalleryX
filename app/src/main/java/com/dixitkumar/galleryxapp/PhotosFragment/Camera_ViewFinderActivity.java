@@ -17,6 +17,8 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -41,6 +43,9 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.ZoomState;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.lifecycle.LiveData;
 
 import com.bumptech.glide.Glide;
@@ -108,9 +113,21 @@ import java.util.concurrent.ExecutorService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        //For Viewing Video In Phone Notch Area
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        }
+
         viewFinderBinding = ActivityCameraViewfinderBinding.inflate(getLayoutInflater());
         setTheme(R.style.CameraTheme);
         setContentView(viewFinderBinding.getRoot());
+
+        //For Immersive Mode
+        WindowCompat.setDecorFitsSystemWindows(getWindow(),false);
+        new WindowInsetsControllerCompat(getWindow(),viewFinderBinding.getRoot()).setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        new WindowInsetsControllerCompat(getWindow(),viewFinderBinding.getRoot()).hide(WindowInsetsCompat.Type.systemBars());
 
         takeKeyEvents(true);
         //setting up the camera Preview
@@ -121,12 +138,6 @@ import java.util.concurrent.ExecutorService;
         } else {
             startCamera(cameraFacing);
         }
-
-
-      //Setting up Camera Settings Button
-        viewFinderBinding.opnCameraSettings.setOnClickListener(v -> {
-            Toast.makeText(this, "Currently not Available", Toast.LENGTH_SHORT).show();
-        });
 
         //Camera QR Code Layout
 
@@ -242,7 +253,7 @@ import java.util.concurrent.ExecutorService;
                             }
                             captureImage(imageCapture);
                             cameraTime.stop();
-                        }, 5000);
+                        }, 7000);
                     }else if(IS_TRANSLATION_MODE_ON){
                         captureImage(imageCapture);
                        // Setting up the Translator mode

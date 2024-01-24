@@ -46,7 +46,6 @@ public class ImageViewerActivity extends AppCompatActivity {
    private String filePath="";
    private File imageFile ;
    private  Bitmap bitmap;
-   private static boolean IsImageFavouriteSelected = false;
     int imageNumber=1;
 
 
@@ -113,17 +112,6 @@ public class ImageViewerActivity extends AppCompatActivity {
            Intent i = new Intent(ImageViewerActivity.this, TextTranslatorActivity.class);
            i.putExtra("IMAGE_URI",imageUri.toString());
            startActivity(i);
-        });
-
-        //Setting Up Favourite Image Button
-        imageViewerBinding.favouriteImageButton.setOnClickListener(view -> {
-            if(!IsImageFavouriteSelected){
-                imageViewerBinding.favouriteImageButton.setImageResource(R.drawable.favourite_image_filled_icon);
-                IsImageFavouriteSelected = true;
-            }else{
-                imageViewerBinding.favouriteImageButton.setImageResource(R.drawable.favourite_image_empty_icon);
-                IsImageFavouriteSelected = false;
-            }
         });
 
         imageViewerBinding.cropImageButton.setOnClickListener(view -> {

@@ -52,6 +52,7 @@ public class TextTranslatorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         textTranslatorBinding = ActivityTextTranslatorBinding.inflate(getLayoutInflater());
+        setTheme(R.style.CameraTheme);
         setContentView(textTranslatorBinding.getRoot());
 
         //Receiving The Image Uri

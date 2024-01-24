@@ -19,6 +19,9 @@ import androidx.camera.video.VideoCapture;
 import androidx.camera.video.VideoRecordEvent;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -33,6 +36,8 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,9 +90,21 @@ public class VideoViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        //For Viewing Video In Phone Notch Area
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        }
         videoViewBinding = ActivityVideoViewBinding.inflate(getLayoutInflater());
         setTheme(R.style.CameraTheme);
         setContentView(videoViewBinding.getRoot());
+
+        //For Immersive Mode
+        WindowCompat.setDecorFitsSystemWindows(getWindow(),false);
+        new WindowInsetsControllerCompat(getWindow(),videoViewBinding.getRoot()).setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        new WindowInsetsControllerCompat(getWindow(),videoViewBinding.getRoot()).hide(WindowInsetsCompat.Type.systemBars());
+
 
         //Capturing The Video on Click of Record Button
         videoViewBinding.recordButton.setOnClickListener(view -> {
