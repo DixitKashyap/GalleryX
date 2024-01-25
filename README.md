@@ -29,7 +29,7 @@ width= 45% height=30%/>
 <b> Features : </b>
 <ul>
 <li>Image Viewer
-<li>Image Sharying
+<li>Image Sharing
 <li>Image Cropping
 <li>Text Recognition Form Images
 <li>Basic Text Translation
