@@ -68,7 +68,12 @@ public class Album_Fragment extends Fragment {
                     startActivity(intent);
                 });
             }else{
-                albumBinding.screenShotLayout.setVisibility(View.GONE);
+                albumBinding.allScreenShots.setImageResource(R.drawable.image1);
+                albumBinding.AllScreenShotsNumber.setVisibility(View.GONE);
+
+                albumBinding.screenShotLayout.setOnClickListener(view -> {
+                    Toast.makeText(getContext(), "No Images Here", Toast.LENGTH_SHORT).show();
+                });
             }
 
             if(cameraPhotos.size()!=0){
@@ -85,7 +90,10 @@ public class Album_Fragment extends Fragment {
                 });
 
             }else {
-            albumBinding.cameraImageLayout.setVisibility(View.GONE);
+                albumBinding.allCameraImages.setImageResource(R.drawable.image1);
+            albumBinding.AllCameraImagesNumber.setVisibility(View.GONE);
+
+            albumBinding.cameraImageLayout.setOnClickListener(view -> Toast.makeText(getContext(), "No Images Here", Toast.LENGTH_SHORT).show());
             }
 
             if(galleryXApp.size()!=0){
@@ -103,7 +111,10 @@ public class Album_Fragment extends Fragment {
                 });
 
             }else{
-               albumBinding.galleryXImageLayout.setVisibility(View.GONE);
+                albumBinding.allGalleryXImages.setImageResource(R.drawable.image1);
+               albumBinding.allGalleryXImageNumber.setVisibility(View.GONE);
+
+               albumBinding.galleryXImageLayout.setOnClickListener(view -> Toast.makeText(getContext(), "No Images Here", Toast.LENGTH_SHORT).show());
             }
             if(localStorage.size()!=0){
                 albumBinding.allLocalStorageImages.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -119,7 +130,12 @@ public class Album_Fragment extends Fragment {
                 });
 
             }else{
-                albumBinding.localImageLayout.setVisibility(View.GONE);
+                albumBinding.allLocalStorageImages.setImageResource(R.drawable.image1);
+                albumBinding.localStorageNumber.setVisibility(View.GONE);
+
+                albumBinding.localImageLayout.setOnClickListener(view -> {
+                    Toast.makeText(getContext(), "No Images Here", Toast.LENGTH_SHORT).show();
+                });
             }
             if(croppedImages.size()!=0){
 
@@ -138,7 +154,11 @@ public class Album_Fragment extends Fragment {
                     }
                 });
             }else{
-                albumBinding.croppedImageLayout.setVisibility(View.GONE);
+                albumBinding.allCroppedImages.setImageResource(R.drawable.image1);
+                albumBinding.allCroppedImagesNumber.setVisibility(View.GONE);
+                albumBinding.croppedImageLayout.setOnClickListener(view -> {
+                    Toast.makeText(getContext(), "No Images Here", Toast.LENGTH_SHORT).show();
+                });
             }
         }
          return albumBinding.getRoot();
