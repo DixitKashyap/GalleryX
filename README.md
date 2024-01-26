@@ -4,12 +4,9 @@
 
 <b>Simple Gallery App with Build-in Camera,Video Recorder and Video Player.</b><br>
 
-<<<<<<< HEAD
+
 <b>Screenshots Of GalleryXApp :</br>
 <img src = "https://github.com/DixitKashyap/GalleryX/blob/main/Screenshots/5.jpg"
-=======
-<b>Screenshots Of GalleryXApp :</br><img src = "https://github.com/DixitKashyap/GalleryX/blob/main/Screenshots/5.jpg"
->>>>>>> 69ec6ec59055be792a10be064863ef98b8f0399b
 width=100% height=50%/>
 <img src ="https://github.com/DixitKashyap/GalleryX/blob/main/Screenshots/1.jpg"
 width=45% height=30%/>
